@@ -189,7 +189,7 @@ class SignupPage:
                 ft.Container(ft.Row([
                     ft.Column(
                         [
-                            ft.Text("Регистрация", size=30, color=ft.colors.BLUE),
+                            ft.Text("Регистрацияпше", size=30, color=ft.colors.BLUE),
                             ft.TextField(ref=name,
                                          label="Имя",
                                          autofocus=True,
