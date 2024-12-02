@@ -6,12 +6,12 @@ from MAIN_PAGE.main_page import Main_page
 
 class Router:
     def __init__(self, page: ft.Page):
-        self.page = page
         self.app_routes = [
+            path(url='/main', clear=False, view=Main_page().view),
             path(url='/', clear=True, view=LoginPage().view),
             path(url='/signup', clear=False, view=SignupPage().view),
-            #path(url='/main', clear=False, view=Main_page().view),
         ]
+        self.page = page
 
         Routing(
             page=self.page,

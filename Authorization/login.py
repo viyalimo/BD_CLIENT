@@ -27,7 +27,7 @@ class LoginPage:
         password = ft.Ref[ft.TextField]()
         page.theme_mode = ft.ThemeMode.DARK
         back_image = self.get_image("Dark")
-        password_visible = False
+
 
         def btn_click(e):
             if not name.current.value:
@@ -57,8 +57,10 @@ class LoginPage:
                     content=ft.Row([ft.Text("Вы успешно вошли!", color='white')],
                                    alignment=ft.MainAxisAlignment.CENTER),
                     bgcolor=ft.colors.GREEN,
+
                 )
                 page.snack_bar.open = True
+                page.go('/main')
             else:
                 page.snack_bar = ft.SnackBar(
                     content=ft.Row([ft.Text(f"{responce.text[1:-1]}", color='white')],

@@ -127,6 +127,7 @@ class SignupPage:
                     bgcolor=ft.colors.GREEN,
                 )
                 page.snack_bar.open = True
+                page.go('/main')
             else:
                 page.snack_bar = ft.SnackBar(
                     content=ft.Row([
@@ -189,7 +190,7 @@ class SignupPage:
                 ft.Container(ft.Row([
                     ft.Column(
                         [
-                            ft.Text("Регистрацияпше", size=30, color=ft.colors.BLUE),
+                            ft.Text("Регистрация", size=30, color=ft.colors.BLUE),
                             ft.TextField(ref=name,
                                          label="Имя",
                                          autofocus=True,
