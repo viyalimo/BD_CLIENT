@@ -7,8 +7,8 @@ from MAIN_PAGE.main_page import Main_page
 class Router:
     def __init__(self, page: ft.Page):
         self.app_routes = [
-            path(url='/main', clear=False, view=Main_page().view),
-            path(url='/', clear=True, view=LoginPage().view),
+            path(url='/', clear=False, view=Main_page().view),
+            path(url='/login', clear=True, view=LoginPage().view),
             path(url='/signup', clear=False, view=SignupPage().view),
         ]
         self.page = page

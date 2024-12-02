@@ -127,7 +127,7 @@ class SignupPage:
                     bgcolor=ft.colors.GREEN,
                 )
                 page.snack_bar.open = True
-                page.go('/main')
+                page.go('/')
             else:
                 page.snack_bar = ft.SnackBar(
                     content=ft.Row([
@@ -249,7 +249,7 @@ class SignupPage:
                                           style=ft.ButtonStyle(
                                               color=ft.colors.BLUE,
                                           ),
-                                          on_click=lambda _: page.go('/')),
+                                          on_click=lambda _: page.go('/login')),
 
                         ],
                         alignment=ft.MainAxisAlignment.CENTER,

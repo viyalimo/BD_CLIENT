@@ -60,7 +60,7 @@ class LoginPage:
 
                 )
                 page.snack_bar.open = True
-                page.go('/main')
+                page.go('/')
             else:
                 page.snack_bar = ft.SnackBar(
                     content=ft.Row([ft.Text(f"{responce.text[1:-1]}", color='white')],

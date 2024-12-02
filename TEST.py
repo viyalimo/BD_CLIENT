@@ -1,105 +1,73 @@
-
 import flet as ft
 
 def main(page: ft.Page):
-    # Функция для обновления цветов прямоугольника и иконок
-    def update_colors():
-        if page.theme_mode == ft.ThemeMode.LIGHT:
-            return {
-                "bgcolor": ft.colors.WHITE,
-                "border_color": ft.colors.BLACK,
-                "icon_color": ft.colors.BLACK,
-            }
-        else:
-            return {
-                "bgcolor": ft.colors.BLACK,
-                "border_color": ft.colors.BLUE,
-                "icon_color": ft.colors.BLUE,
-            }
+    def search_action(e):
+        print(f"Ищем: {search_field.value}")  # Выводим введённый текст
+        search_field.value = ""  # Очищаем поле ввода
+        page.update()  # Обновляем интерфейс
 
-    # Функция смены темы
-    def toggle_theme(e):
-        if page.theme_mode == ft.ThemeMode.LIGHT:
-            page.theme_mode = ft.ThemeMode.DARK
-        else:
-            page.theme_mode = ft.ThemeMode.LIGHT
-
-        # Обновляем цвета
-        colors = update_colors()
-        top_rectangle.bgcolor = colors["bgcolor"]
-        top_rectangle.border = ft.border.all(1, colors["border_color"])
-
-        # Обновляем цвета иконок
-        menu_button.icon_color = colors["icon_color"]
-        theme_button.icon_color = colors["icon_color"]
-        favorite_button.icon_color = colors["icon_color"]
-        cart_button.icon_color = colors["icon_color"]
-        profile_button.icon_color = colors["icon_color"]
-
-        # Меняем иконку для кнопки темы
-        theme_button.icon = (
-            ft.icons.LIGHT_MODE
-            if page.theme_mode == ft.ThemeMode.LIGHT
-            else ft.icons.DARK_MODE
-        )
-
+    def clear_action(e):
+        search_field.value = ""  # Очищаем поле ввода
         page.update()
 
-    # Начальные цвета
-    colors = update_colors()
+    def handle_change(e):
+        # Показываем или скрываем крестик, в зависимости от наличия текста
+        clear_button.visible = bool(search_field.value.strip())
+        page.update()
 
-    # Иконки
-    menu_button = ft.IconButton(icon=ft.icons.MENU, icon_color=colors["icon_color"])
-    theme_button = ft.IconButton(
-        icon=ft.icons.LIGHT_MODE
-        if page.theme_mode == ft.ThemeMode.LIGHT
-        else ft.icons.DARK_MODE,
-        icon_color=colors["icon_color"],
-        on_click=toggle_theme,
-    )
-    favorite_button = ft.IconButton(
-        icon=ft.icons.FAVORITE, icon_color=colors["icon_color"]
-    )
-    cart_button = ft.IconButton(
-        icon=ft.icons.SHOPPING_CART, icon_color=colors["icon_color"]
-    )
-    profile_button = ft.IconButton(
-        icon=ft.icons.PERSON_2, icon_color=colors["icon_color"]
+    # Кнопка для очистки текста (крестик внутри поля)
+    clear_button = ft.IconButton(
+        icon=ft.icons.CLOSE,  # Иконка крестика
+        icon_size=12,
+        icon_color=ft.colors.BLACK,  # Цвет иконки
+        on_click=clear_action,  # Очищаем поле при нажатии
+        visible=False,  # Показываем только если в поле есть текст
     )
 
-    # Прямоугольник
-    top_rectangle = ft.Container(
+    # Поле ввода с крестиком внутри
+    search_field = ft.TextField(
+        hint_text="Введите запрос",  # Текст-подсказка
+        expand=True,  # Растягиваем поле ввода
+        height=50,  # Высота текстового поля
+        bgcolor=ft.colors.WHITE,  # Белый фон для текстового поля
+        color=ft.colors.BLACK,  # Цвет текста
+        text_style=ft.TextStyle(size=16),  # Размер текста
+        text_align=ft.TextAlign.LEFT,  # Выравнивание текста по левому краю
+        on_change=handle_change,  # Слушаем изменения текста
+        border_radius=15,
+        suffix=clear_button,  # Крестик внутри поля ввода
+    )
+
+    # Кнопка поиска
+    search_button = ft.IconButton(
+        icon=ft.icons.SEARCH,  # Иконка лупы
+        icon_color=ft.colors.BLACK,  # Цвет иконки
+        on_click=search_action,  # Действие при нажатии
+    )
+
+    # Контейнер с полем ввода и кнопкой поиска
+    search_bar = ft.Container(
         content=ft.Row(
             [
-                menu_button,  # Кнопка меню слева
-                ft.Container(content=theme_button, alignment=ft.Alignment(0, 0), expand=True),  # Смена темы в центре
-                ft.Row(
-                    [
-                        favorite_button,
-                        cart_button,
-                        profile_button,
-                    ],
-                    alignment=ft.MainAxisAlignment.END,
-                    spacing=10,
-                ),  # Остальные кнопки справа
+                search_field,  # Поле ввода с крестиком
+                search_button,  # Кнопка поиска справа
             ],
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            spacing=5,  # Расстояние между полем ввода и кнопкой
+            alignment=ft.MainAxisAlignment.START,  # Выравнивание по левому краю
         ),
-        height=50,
-        bgcolor=colors["bgcolor"],  # Фон
-        border=ft.border.all(1, colors["border_color"]),  # Граница
-        border_radius=ft.border_radius.all(10),  # Скругление
+        padding=ft.padding.all(0),  # Убираем внешние отступы
     )
 
-    # Основной контент
+    # Основной контент страницы
     page.add(
-        ft.Stack(
+        ft.Column(
             [
-                top_rectangle,  # Верхний прямоугольник
+                ft.Text("Поисковая строка с кнопками", size=20, weight=ft.FontWeight.BOLD),
+                search_bar,
             ],
+            alignment=ft.MainAxisAlignment.START,
             expand=True,
         )
     )
-
 
 ft.app(target=main)
