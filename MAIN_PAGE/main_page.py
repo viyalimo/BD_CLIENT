@@ -1,4 +1,3 @@
-
 import flet as ft
 from functools import lru_cache
 import requests
@@ -33,7 +32,7 @@ class Main_page:
         return base_64_image
 
     def view(self, page: ft.Page, params=None, basket=None):
-        page.theme_mode = ft.ThemeMode.LIGHT  # Устанавливаем начальный стиль
+        page.theme_mode = ft.ThemeMode.DARK  # Устанавливаем начальный стиль
 
         # Функция для обновления цветов
         def update_colors():
@@ -57,6 +56,7 @@ class Main_page:
                 "icon_rectangle_size": 20,
                 "divider_size": 5,
             }
+
         # Функция для смены темы
         def style_revert(e):
             if page.theme_mode == ft.ThemeMode.DARK:
@@ -69,8 +69,8 @@ class Main_page:
                 icon_but.icon_color = ft.colors.BLUE
 
             colors = update_colors()
-            #top_rectangle.bgcolor = colors["bgcolor"]
-            #top_rectangle.border = ft.border.all(1, colors["border_color"])
+            # top_rectangle.bgcolor = colors["bgcolor"]
+            # top_rectangle.border = ft.border.all(1, colors["border_color"])
             name_shop.color = colors["text_color"]
             search_field.bgcolor = colors["bgcolor"]
             search_field.border_color = colors["border_color"]
@@ -79,7 +79,7 @@ class Main_page:
             divider.color = colors["border_color"]
 
             # Обновление иконок в top_rectangle
-            Menu_button.icon_color = colors["icon_color"]
+            #Menu_button.icon_color = colors["icon_color"]
             Favorite_button.icon_color = colors["icon_color"]
             Cart_button.icon_color = colors["icon_color"]
             Profile_button.icon_color = colors["icon_color"]
@@ -111,31 +111,50 @@ class Main_page:
                 controls.append(ft.Row(row_controls, alignment=ft.MainAxisAlignment.CENTER))
             return ft.Column(controls, alignment=ft.MainAxisAlignment.CENTER)
 
-        # Верхний прямоугольник
-        icon_but = ft.IconButton(icon=ft.icons.SUNNY, on_click=style_revert, icon_color=update_colors()["icon_color"], icon_size=update_size()['icon_rectangle_size'])
-        Menu_button = ft.IconButton(icon=ft.icons.MENU, icon_color=update_colors()["icon_color"], icon_size=update_size()['icon_rectangle_size'])
-        Favorite_button = ft.IconButton(icon=ft.icons.FAVORITE, icon_color=update_colors()["icon_color"], icon_size=update_size()['icon_rectangle_size'])
-        Cart_button = ft.IconButton(icon=ft.icons.SHOPPING_CART, icon_color=update_colors()["icon_color"], icon_size=update_size()['icon_rectangle_size'])
-        Profile_button = ft.IconButton(icon=ft.icons.PERSON, icon_color=update_colors()["icon_color"], icon_size=update_size()['icon_rectangle_size'])
+        def open_devider(e):
+            page.views[-1].drawer = page.drawer
+            # page.drawer.open = True
+            # page.drawer.update()
+            page.update()
 
-        top_rectangle = ft.Container(
-            content=ft.Row(
-                [
-                    Menu_button,
-                    #ft.Container(content=icon_but, alignment=ft.Alignment(0.06, 0), expand=True),
-                    ft.Row(
-                        [icon_but, Favorite_button, Cart_button, Profile_button],
-                        alignment=ft.MainAxisAlignment.END,
-                        spacing=10,
-                    ),
-                ],
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            ),
-            #height=32,
-            #border_radius=15,
-            # bgcolor=update_colors()["bgcolor"],
-            # border=ft.border.all(1, update_colors()["border_color"]),
-        )
+        # page.drawer = ft.NavigationDrawer(
+        #     elevation=40,
+        #     indicator_color='blue200',
+        #     indicator_shape=ft.StadiumBorder(),
+        #     shadow_color='red200',
+        #     surface_tint_color='red200',
+        #     selected_index=0,
+        #     # on_change=mychange_nav,
+        #     controls=[
+        #         ft.Container(height=15),
+        #         ft.NavigationDrawerDestination(
+        #             label="Home",
+        #             icon="home",
+        #             selected_icon_content=ft.Icon(ft.icons.ACCESS_ALARM)
+        #         ),
+        #         ft.Divider(thickness=2),
+        #         ft.NavigationDrawerDestination(
+        #             label="second",
+        #             icon="mail",
+        #             selected_icon_content=ft.Icon(ft.icons.PHISHING)
+        #         ),
+        #         ft.NavigationDrawerDestination(
+        #             label="thrid",
+        #             icon="phone",
+        #             selected_icon_content=ft.Icon(ft.icons.PHISHING)
+        #         ),
+        #     ]
+        # )
+
+        # Верхний прямоугольник
+        icon_but = ft.IconButton(icon=ft.icons.SUNNY, on_click=style_revert, icon_color=update_colors()["icon_color"],
+                                 icon_size=update_size()['icon_rectangle_size'])
+        Favorite_button = ft.IconButton(icon=ft.icons.FAVORITE, icon_color=update_colors()["icon_color"],
+                                        icon_size=update_size()['icon_rectangle_size'])
+        Cart_button = ft.IconButton(icon=ft.icons.SHOPPING_CART, icon_color=update_colors()["icon_color"],
+                                    icon_size=update_size()['icon_rectangle_size'])
+        Profile_button = ft.IconButton(icon=ft.icons.PERSON, icon_color=update_colors()["icon_color"],
+                                       icon_size=update_size()['icon_rectangle_size'])
 
         # Название магазина
         name_shop = ft.Text(
@@ -144,8 +163,6 @@ class Main_page:
             weight=ft.FontWeight.BOLD,
             color=update_colors()["text_color"],
         )
-
-
 
         search_button = ft.IconButton(
             icon=ft.icons.SEARCH,
@@ -165,31 +182,53 @@ class Main_page:
             suffix=search_button,
         )
 
-
+        """Полоска разделитель"""
         divider = ft.Divider(height=update_size()["divider_size"], color=update_colors()["border_color"])
 
+        # Menu_button = ft.IconButton(icon=ft.icons.MENU,
+        #                             icon_color=update_colors()["icon_color"],
+        #                             icon_size=update_size()['icon_rectangle_size'],
+        #                             on_click=open_devider,
+        #                             )  # Добавляем обработчик клика
 
-        # Основной контейнер
+        top_rectangle = ft.Container(
+            content=ft.Row(
+                [
+                    #Menu_button,
+                    ft.Row(
+                        [icon_but, Favorite_button, Cart_button, Profile_button],
+                        alignment=ft.MainAxisAlignment.END,
+                        spacing=10,
+                    ),
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            ),
+            # height=32,
+            # border_radius=15,
+            # bgcolor=update_colors()["bgcolor"],
+            # border=ft.border.all(1, update_colors()["border_color"]),
+        )
+
         icon_back = ft.Container(content=update_images(), expand=True)
 
         content = ft.Column(
+            [
+                top_rectangle,
+                ft.Container(content=name_shop, alignment=ft.Alignment(0, 0), padding=ft.padding.only(top=50)),
+                ft.Row(
+                    [search_field],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+                ft.Container(content=divider, alignment=ft.Alignment(0, 0), padding=ft.padding.only(top=20)),
+                ft.Stack(
                     [
-                        top_rectangle,
-                        ft.Container(content=name_shop, alignment=ft.Alignment(0, 0), padding=ft.padding.only(top=50)),
-                        ft.Row(
-                            [search_field],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                        ),
-                        ft.Container(content=divider, alignment=ft.Alignment(0,0), padding=ft.padding.only(top=20)),
-                        ft.Stack(
-                            [
-                                icon_back,
-                            ]
-                        )
-
-                    ],
-                    spacing=10,
-                    expand=True,
+                        icon_back,
+                    ]
                 )
+
+            ],
+            spacing=10,
+            expand=True,
+        )
 
         return ft.View("/", controls=[content])
