@@ -1,5 +1,5 @@
 import flet as ft
-from router import Router
+from help_function.router import Router
 
 
 def main(page: ft.Page):
@@ -8,4 +8,8 @@ def main(page: ft.Page):
 
 
 if __name__ == "__main__":
-    ft.app(target=main, view=ft.AppView.WEB_BROWSER)
+    ft.app(target=main,
+           view=ft.AppView.WEB_BROWSER,
+           # host="192.168.0.105",
+           # port=40000
+           )

@@ -1,26 +1,12 @@
 import flet as ft
 from flet_route import Params, Basket
-import base64
-import io
 import requests
-from functools import lru_cache
+from help_function.Navigation import Navigation
 
 
-class SignupPage:
-    @lru_cache
-    def get_image(self, name, style=None):
-        if style:
-            request = requests.get(
-                f"http://127.0.0.1:8000/images/{style}/{name}.png")
-            image = io.BytesIO(request.content)
-            base_64_image = base64.b64encode(image.read()).decode()
-            return base_64_image
-        else:
-            request = requests.get(
-                f"http://127.0.0.1:8000/images/{name}.jpg")
-            image = io.BytesIO(request.content)
-            base_64_image = base64.b64encode(image.read()).decode()
-            return base_64_image
+class SignupPage(Navigation):
+    def __init__(self):
+        super().__init__()
 
     def view(self, page: ft.Page, params: Params, basket: Basket):
         page.theme_mode = ft.ThemeMode.LIGHT
@@ -29,7 +15,7 @@ class SignupPage:
         password = ft.Ref[ft.TextField]()
         re_enter_password = ft.Ref[ft.TextField]()
         page.theme_mode = ft.ThemeMode.DARK
-        back_image = self.get_image("Dark")
+        back_image = self.get_image("Dark", "jpg")
 
         def btn_click(e):
             if not name.current.value:
@@ -112,7 +98,7 @@ class SignupPage:
                 page.update()
                 return
 
-            responce = requests.post('http://127.0.0.1:8000/register', json={
+            responce = requests.post('http://192.168.0.105:30000/register', json={
                 "username": name.current.value,
                 "password": password.current.value,
                 "phone_number": str(phone_number.current.value),
@@ -146,20 +132,20 @@ class SignupPage:
 
         # Списки изображений для светлой и тёмной темы
         instruments_light = [
-            self.get_image(r"drum_light", "LIGHT"),
-            self.get_image(r"electro_light", "LIGHT"),
-            self.get_image(r"fleit_light", "LIGHT"),
-            self.get_image(r"guitar_light", "LIGHT"),
-            self.get_image(r"piano_light", "LIGHT"),
-            self.get_image(r"pick_light", "LIGHT"),
+            self.get_image("drum_light", "png", "LIGHT"),
+            self.get_image("electro_light", "png", "LIGHT"),
+            self.get_image("fleit_light", "png", "LIGHT"),
+            self.get_image("guitar_light", "png", "LIGHT"),
+            self.get_image("piano_light", "png", "LIGHT"),
+            self.get_image("pick_light", "png", "LIGHT"),
         ]
         instruments_dark = [
-            self.get_image(r"drum_dark", "DARK"),
-            self.get_image(r"electro_dark", "DARK"),
-            self.get_image(r"fleit_dark", "DARK"),
-            self.get_image(r"guitar_dark", "DARK"),
-            self.get_image(r"piano_dark", "DARK"),
-            self.get_image(r"pick_dark", "DARK"),
+            self.get_image("drum_dark", "png", "DARK"),
+            self.get_image("electro_dark", "png", "DARK"),
+            self.get_image("fleit_dark", "png", "DARK"),
+            self.get_image("guitar_dark", "png", "DARK"),
+            self.get_image("piano_dark", "png", "DARK"),
+            self.get_image("pick_dark", "png", "DARK"),
         ]
 
         def update_images():
@@ -287,11 +273,11 @@ class SignupPage:
             nonlocal back_image
             if page.theme_mode == ft.ThemeMode.DARK:
                 page.theme_mode = ft.ThemeMode.LIGHT
-                back_image = self.get_image("Light")
+                back_image = self.get_image("Light", "jpg")
                 icon_but.icon = ft.icons.DARK_MODE_OUTLINED
             else:
                 page.theme_mode = ft.ThemeMode.DARK
-                back_image = self.get_image("Dark")
+                back_image = self.get_image("Dark", "jpg")
                 icon_but.icon = ft.icons.SUNNY
 
             main_con.controls[0].content = update_images()

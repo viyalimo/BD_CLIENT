@@ -1,10 +1,12 @@
 import flet as ft
-from Navigation import Navigation
+from flet_core import Alignment
 
-
-from MAIN_PAGE.Category_batton import Category_batton
-from Category.Card_generate import Card_generate
+from help_function.Navigation import Navigation
+from help_function.Category_batton import Category_batton
+from help_function.Card_generate import Card_generate
 from flet_route import Params, Basket
+from help_function.manufactures_card import Manufactures_Card
+
 
 class Main_page(Navigation):
     def __init__(self):
@@ -156,7 +158,7 @@ class Main_page(Navigation):
                 updated_colors = card_app.update_colors()
                 card_app.container1.bgcolor = updated_colors["bgcolor"]
                 card_app.container1.border = ft.border.all(2, updated_colors["card_border_color"])
-                #card_app.icon_container_.bgcolor = updated_colors["icon_background_color"]
+                # card_app.icon_container_.bgcolor = updated_colors["icon_background_color"]
 
                 card_app.container1.content.controls[0].content.controls[0].border = ft.border.all(2, updated_colors[
                     "border_color"])
@@ -174,7 +176,7 @@ class Main_page(Navigation):
                 card_app.container1.content.controls[2].content.controls[0].controls[4].color = updated_colors[
                     "text_color"]
                 # Обновляем элементы
-                #card_app.icon_container_.update()
+                # card_app.icon_container_.update()
                 card_app.container1.update()
 
             page.update()
@@ -239,10 +241,44 @@ class Main_page(Navigation):
                 image_base64 = product[7]
                 warehouse = product[8]
 
-                app = Card_generate(id_product, name, price, image_from_base64(image_base64), category, quantity, page, brand)
+                app = Card_generate(id_product, name, price, image_from_base64(image_base64), category, quantity, page,
+                                    brand)
                 product_card.append(app)
         else:
             pass
+
+        manufacture = self.get_all_manufacturers()
+        manufacturer_cards = []
+        if manufacture:
+            for manufacturer in manufacture:
+                id_manufacturer = manufacturer[0]
+                image = manufacturer[2]
+
+                card_builder = Manufactures_Card(id_manufacturer, image, page)
+                manufacturer_cards.append(card_builder.container)
+        else:
+            pass
+
+        rows = []  # Массив строк
+        for i in range(0, len(manufacturer_cards), 2):
+            if i + 1 < len(manufacturer_cards):
+                # Если есть две карточки для строки
+                row = ft.Row(
+                    controls=[
+                        manufacturer_cards[i],
+                        manufacturer_cards[i + 1]
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    spacing=20,
+                )
+            else:
+                # Если последняя карточка без пары
+                row = ft.Row(
+                    controls=[manufacturer_cards[i]],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    spacing=20,
+                )
+            rows.append(row)
 
         buttons_row = ft.Row(
             controls=buttons,
@@ -273,7 +309,7 @@ class Main_page(Navigation):
                                 content=ft.TextButton(
                                     content=ft.Text("Струнные", size=update_size()["Menu_other_text_size"],
                                                     color=update_colors()["text_color"]),
-                                    on_click=lambda e:next_page("/category/Струнные")),
+                                    on_click=lambda e: next_page("/category/Струнные")),
                                 padding=ft.padding.only(left=10),
                             ),
                             ft.Container(
@@ -315,7 +351,7 @@ class Main_page(Navigation):
                                 content=ft.TextButton(
                                     content=ft.Text("Производители", size=update_size()["Menu_other_text_size"],
                                                     color=update_colors()["text_color"]),
-                                    on_click=lambda e: next_page('/category/Производители')),
+                                    on_click=lambda e: next_page('/Производители')),
                                 padding=ft.padding.only(left=10),
                             ),
                             ft.Divider(height=2, color=update_colors()["text_color"]),
@@ -333,7 +369,6 @@ class Main_page(Navigation):
                                     on_click=lambda e: next_page('/')),
                                 padding=ft.padding.only(left=10),
                             ),
-
 
                         ],
                         # scroll=ft.ScrollMode.ALWAYS
@@ -415,6 +450,8 @@ class Main_page(Navigation):
                                    size=update_size()["Title_size"])
         title_total_products = ft.Text("Популярные товары", color=update_colors()["text_color"],
                                        size=update_size()["Title_size"])
+        title_manufacture = ft.Text("Производители", color=update_colors()["text_color"],
+                                    size=update_size()["Title_size"])
         icon_back = ft.Container(content=update_images(), expand=True)
         """Популярные категории и товары"""
         show_conteiner = ft.Container(
@@ -474,6 +511,16 @@ class Main_page(Navigation):
                     ],
                         alignment=ft.MainAxisAlignment.CENTER,
                     ),
+                    ft.Container(content=title_manufacture, alignment=Alignment(0, 0), expand=True),
+                    ft.Divider(height=2, color=update_colors()["border_color"]),
+                    ft.Container(
+                        content=ft.Column(
+                            controls=rows,
+                            alignment=ft.MainAxisAlignment.CENTER,
+                        ),
+                        alignment=ft.Alignment(0, 0),
+                        expand=True,
+                    )
                 ],
                 spacing=10,
                 scroll=ft.ScrollMode.ALWAYS,
