@@ -196,6 +196,7 @@ class Card_product(Navigation):
             Menu_content.controls[0].content.controls[9].color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[10].content.content.color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[11].content.content.color = update_colors()['text_color']
+            Menu_content.controls[0].content.controls[12].content.content.color = update_colors()['text_color']
 
 
 
@@ -235,9 +236,6 @@ class Card_product(Navigation):
 
             page.update()
 
-        def next_page(muve):
-            page.client_storage.set("muve", muve)
-            page.go("/loading")
 
         """Upper Content"""
 
@@ -308,14 +306,21 @@ class Card_product(Navigation):
                                     content=Text("Главная", size=update_size()["Menu_zag_text_size"],
                                                  color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/')),
-                                padding=padding.only(left=10),
+                                padding=padding.only(left=5),
                             ),
                             Container(
                                 content=TextButton(
                                     content=Text("Лента товаров", size=update_size()["Menu_zag_text_size"],
                                                  color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/productsfeed')),
-                                padding=padding.only(left=10),
+                                padding=padding.only(left=5),
+                            ),
+                            Container(
+                                content=TextButton(
+                                    content=Text("Расширенный поиск", size=update_size()["Menu_zag_text_size"],
+                                                    color=update_colors()["text_color"]),
+                                    on_click=lambda e: next_page('/search')),
+                                padding=padding.only(left=5),
                             ),
                         ],
                         # scroll=ScrollMode.ALWAYS

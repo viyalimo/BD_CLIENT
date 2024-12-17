@@ -1,10 +1,12 @@
+from help_function.Navigation import Navigation
 from flet import *
 from help_function.Card_generate import Card_generate
 from flet_route import Params, Basket
-from help_function.Navigation import Navigation
 
-class SimpleSearch(Navigation):
+
+class AdvancedSearch(Navigation):
     def __init__(self):
+
         self.instruments_light = [
             self.get_image(r"drum_light", "png", "LIGHT"),
             self.get_image(r"electro_light", "png", "LIGHT"),
@@ -23,11 +25,10 @@ class SimpleSearch(Navigation):
         ]
         super().__init__()
 
-
-
     def view(self, page: Page, params: Params, basket: Basket):
         page.theme_mode = ThemeMode.DARK
-        search_product_name = params.get("name")[1:]
+        product_id = basket.get("products_id")
+        # products_id = basket.get("products_id")
 
         def next_page(muve):
             page.theme_mode = ThemeMode.DARK
@@ -80,9 +81,18 @@ class SimpleSearch(Navigation):
             }
 
         def animate_menu(e):
-            Menu_content.offset = transform.Offset(0, 0) if Menu_content.offset == transform.Offset(-2, 0) else transform.Offset(
+            Menu_content.offset = transform.Offset(0, 0) if Menu_content.offset == transform.Offset(-2,
+                                                                                                    0) else transform.Offset(
                 -2, 0)
             Menu_content.update()
+
+        def research(e):
+            name = search_field.value
+            prod_id = []
+            for i in self.search_product(name=name):
+                prod_id.append(int(i[0]))
+            basket.products_id = prod_id
+            next_page(f"/search_result")
 
         def style_revert(e):
             if page.theme_mode == ThemeMode.DARK:
@@ -109,8 +119,8 @@ class SimpleSearch(Navigation):
             # обновление меню
             Menu_but.icon_color = colors["icon_color"]
 
-            Menu_content.controls[0].bgcolor=update_colors()['bgcolor']
-            Menu_content.controls[0].border=update_colors()['border_color']
+            Menu_content.controls[0].bgcolor = update_colors()['bgcolor']
+            Menu_content.controls[0].border = update_colors()['border_color']
             """Обновление цветов в меню"""
             Menu_content.controls[0].bgcolor = update_colors()['bgcolor']
             Menu_content.controls[0].border = border.all(2, update_colors()['border_color'])
@@ -126,13 +136,24 @@ class SimpleSearch(Navigation):
             Menu_content.controls[0].content.controls[9].color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[10].content.content.color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[11].content.content.color = update_colors()['text_color']
+            Menu_content.controls[0].content.controls[12].content.content.color = update_colors()['text_color']
+
+            Category_title.color = colors["text_color"]
+            search_field.bgcolor = colors["bgcolor"]
+            search_field.border_color = colors["border_color"]
+            search_field.color = colors["text_color"]
+            search_field.suffix_icon.icon_color = colors["icon_color"]
+            search_field.label_style = TextStyle(color=colors["text_color"])
+            search_field.cursor_color = colors["text_color"]
+            on_advance_search.style = ButtonStyle(color=colors["text_color"])
+            divider.color = colors["text_color"]
 
             """Обновление карточек"""
             for card_app in product_card:
                 updated_colors = card_app.update_colors()
                 card_app.container1.bgcolor = updated_colors["bgcolor"]
                 card_app.container1.border = border.all(2, updated_colors["card_border_color"])
-                #card_app.icon_container_.bgcolor = updated_colors["icon_background_color"]
+                # card_app.icon_container_.bgcolor = updated_colors["icon_background_color"]
 
                 card_app.container1.content.controls[0].content.controls[0].border = border.all(2, updated_colors[
                     "border_color"])
@@ -150,7 +171,7 @@ class SimpleSearch(Navigation):
                 card_app.container1.content.controls[2].content.controls[0].controls[4].color = updated_colors[
                     "text_color"]
                 # Обновляем элементы
-                #card_app.icon_container_.update()
+                # card_app.icon_container_.update()
                 card_app.container1.update()
 
             page.update()
@@ -255,16 +276,23 @@ class SimpleSearch(Navigation):
                             Container(
                                 content=TextButton(
                                     content=Text("Главная", size=update_size()["Menu_zag_text_size"],
-                                                    color=update_colors()["text_color"]),
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/')),
-                                padding=padding.only(left=10),
+                                padding=padding.only(left=5),
                             ),
                             Container(
                                 content=TextButton(
                                     content=Text("Лента товаров", size=update_size()["Menu_zag_text_size"],
-                                                    color=update_colors()["text_color"]),
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/productsfeed')),
-                                padding=padding.only(left=10),
+                                padding=padding.only(left=5),
+                            ),
+                            Container(
+                                content=TextButton(
+                                    content=Text("Расширенный поиск", size=update_size()["Menu_zag_text_size"],
+                                                 color=update_colors()["text_color"]),
+                                    on_click=lambda e: next_page('/search')),
+                                padding=padding.only(left=5),
                             ),
                         ],
                         # scroll=ScrollMode.ALWAYS
@@ -314,12 +342,33 @@ class SimpleSearch(Navigation):
                 alignment=MainAxisAlignment.SPACE_BETWEEN,
             ),
         )
-        Category_title = Text("Результаты поиска", size=70, weight=FontWeight.BOLD, color=update_colors()["text_color"],)
+        search_field = TextField(
+            label="Поиск по названию",
+            height=40,
+            width=700,
+            border_radius=15,
+            bgcolor=update_colors()["bgcolor"],
+            border_color=update_colors()["border_color"],
+            color=update_colors()["text_color"],
+            text_style=TextStyle(size=16),
+            suffix_icon=IconButton(icon=icons.SEARCH,
+                                   icon_size=20,
+                                   icon_color=update_colors()["icon_color"],
+                                   on_click=research),
+            label_style=TextStyle(color=update_colors()["text_color"]),
+            cursor_color=update_colors()["text_color"],
+        )
+        on_advance_search = TextButton(text="Расширенный поиск", style=ButtonStyle(color=update_colors()["text_color"]), on_click=lambda e: next_page('/search'))
+
+        Category_title = Text("Результат поиска", size=70, weight=FontWeight.BOLD,
+                              color=update_colors()["text_color"], )
         divider = Divider(height=update_size()["divider_size"], color=update_colors()["border_color"])
         first_part = Column(
             [
                 top_rectangle,
                 Container(content=Category_title, alignment=Alignment(0, 0), padding=padding.only(top=20)),
+                Container(content=search_field, alignment=Alignment(0, 0), padding=padding.only(top=20)),
+                Container(content=on_advance_search, alignment=Alignment(0, 0), padding=padding.only(top=20)),
                 Container(content=divider, alignment=Alignment(0, 0), padding=padding.only(top=20)),
             ]
         )
@@ -327,7 +376,9 @@ class SimpleSearch(Navigation):
         icon_back = Container(content=update_images(), expand=True)
 
         "Создание карточек с товарами"
-        products = self.search_product_simple(search_product_name)
+        products = []
+        for i in product_id:
+            products.append(self.get_product_id(int(i)))
         product_card = []
         prroduct_row = []
         if products:
@@ -335,15 +386,15 @@ class SimpleSearch(Navigation):
                 id_product = product[0]
                 name = product[1]
                 category = product[2]
-                price = product[3]
-                quantity = product[4]
-                color = product[5]
-                image_base64 = product[6]
-                warehouse = product[7]
-                brand = product[8]
+                brand = product[3]
+                price = product[4]
+                quantity = product[5]
+                color = product[6]
+                image_base64 = product[7]
+                warehouse = product[8]
 
-                app = Card_generate(id_product, name, price, image_from_base64(image_base64), category, quantity, page, brand)
-
+                app = Card_generate(id_product, name, price, image_from_base64(image_base64), category, quantity,
+                                    page, brand)
 
                 product_card.append(app)
             product_row = create_card_rows(product_card)
@@ -373,7 +424,7 @@ class SimpleSearch(Navigation):
             height=page.height / 1.36,
         )
         """соединение всех элементов страницы"""
-        return View("/search/:name", controls=[
+        return View("/search_result", controls=[
             Stack([
                 Column(
                     controls=[

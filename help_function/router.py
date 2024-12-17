@@ -10,7 +10,8 @@ from View.manufacture_choose import ManufacturePage
 from View.manufacture_product import ManufactureProd
 from View.product_feed import ProductFeed
 from View.User_profile import UserPage
-from View.search_result import SimpleSearch
+from View.advanced_search import AdvancedSearchPage
+from View.search_result import AdvancedSearch
 
 class Router:
     def __init__(self, page: ft.Page):
@@ -30,7 +31,8 @@ class Router:
             path(url='/manufacture/:id', clear=False, view=ManufactureProd().view),
             path(url='/productsfeed', clear=False, view=ProductFeed().view),
             path(url='/profile', clear=False, view=UserPage().view),
-            path(url='/search/:name', clear=False, view=SimpleSearch().view),
+            path(url='/search', clear=False, view=AdvancedSearchPage().view),
+            path(url='/search_result', clear=False, view=AdvancedSearch().view),
         ]
         self.page = page
 

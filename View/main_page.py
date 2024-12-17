@@ -1,4 +1,4 @@
-import flet as ft
+from flet import *
 from flet_core import Alignment
 
 from help_function.Navigation import Navigation
@@ -46,14 +46,14 @@ class Main_page(Navigation):
         ]
         super().__init__()
 
-    def view(self, page: ft.Page, params: Params, basket: Basket):
-        page.theme_mode = ft.ThemeMode.DARK
+    def view(self, page: Page, params: Params, basket: Basket):
+        page.theme_mode = ThemeMode.DARK
         page.client_storage.set("style", page.theme_mode.value)
 
         self.get_products_total()
 
         def next_page(muve):
-            page.theme_mode = ft.ThemeMode.DARK
+            page.theme_mode = ThemeMode.DARK
             page.client_storage.set("muve", muve)
             page.go("/loading")
 
@@ -63,37 +63,36 @@ class Main_page(Navigation):
             else:
                 next_page("/profile")
 
-
         # Функция для конвертации Base64 в изображение
         def image_from_base64(base64_str: str):
-            return ft.Image(src=f"data:image/jpeg;base64,{base64_str}", width=200, height=200)
+            return Image(src=f"data:image/jpeg;base64,{base64_str}", width=200, height=200)
 
         # Функция для обновления цветов
         def update_colors():
-            if page.theme_mode == ft.ThemeMode.LIGHT:
+            if page.theme_mode == ThemeMode.LIGHT:
                 return {
-                    "bgcolor": ft.colors.WHITE,
-                    "border_color": ft.colors.BLACK,
-                    "icon_color": ft.colors.BLACK,
-                    "text_color": ft.colors.BLACK,
-                    "tab_color": ft.colors.BLACK,
-                    "border_color_info": ft.colors.BLACK12,
-                    "card_background_color": ft.colors.BLACK12,
-                    "icon_background_color": ft.colors.WHITE,
-                    "card_border_color": ft.colors.BLACK,
+                    "bgcolor": colors.WHITE,
+                    "border_color": colors.BLACK,
+                    "icon_color": colors.BLACK,
+                    "text_color": colors.BLACK,
+                    "tab_color": colors.BLACK,
+                    "border_color_info": colors.BLACK12,
+                    "card_background_color": colors.BLACK12,
+                    "icon_background_color": colors.WHITE,
+                    "card_border_color": colors.BLACK,
 
                 }
             else:
                 return {
-                    "bgcolor": ft.colors.BLACK,
-                    "border_color": ft.colors.BLUE,
-                    "icon_color": ft.colors.BLUE,
-                    "text_color": ft.colors.BLUE,
-                    "tab_color": ft.colors.BLUE,
-                    "border_color_info": ft.colors.BLACK,
-                    "card_background_color": ft.colors.BLACK,
-                    "icon_background_color": ft.colors.BLACK,
-                    "card_border_color": ft.colors.WHITE24,
+                    "bgcolor": colors.BLACK,
+                    "border_color": colors.BLUE,
+                    "icon_color": colors.BLUE,
+                    "text_color": colors.BLUE,
+                    "tab_color": colors.BLUE,
+                    "border_color_info": colors.BLACK,
+                    "card_background_color": colors.BLACK,
+                    "icon_background_color": colors.BLACK,
+                    "card_border_color": colors.WHITE24,
                 }
 
         def update_size():
@@ -107,21 +106,23 @@ class Main_page(Navigation):
 
         # Функция для смены темы
         def style_revert(e):
-            if page.theme_mode == ft.ThemeMode.DARK:
-                page.theme_mode = ft.ThemeMode.LIGHT
-                icon_but.icon = ft.icons.DARK_MODE_OUTLINED
-                icon_but.icon_color = ft.colors.BLACK
+            if page.theme_mode == ThemeMode.DARK:
+                page.theme_mode = ThemeMode.LIGHT
+                icon_but.icon = icons.DARK_MODE_OUTLINED
+                icon_but.icon_color = Colors.BLACK
             else:
-                page.theme_mode = ft.ThemeMode.DARK
-                icon_but.icon = ft.icons.SUNNY
-                icon_but.icon_color = ft.colors.BLUE
+                page.theme_mode = ThemeMode.DARK
+                icon_but.icon = icons.SUNNY
+                icon_but.icon_color = Colors.BLUE
 
             colors = update_colors()
             name_shop.color = colors["text_color"]
             search_field.bgcolor = colors["bgcolor"]
             search_field.border_color = colors["border_color"]
             search_field.color = colors["text_color"]
-            search_button.icon_color = colors["icon_color"]
+            search_field.suffix_icon.icon_color = colors["icon_color"]
+            search_field.label_style = TextStyle(color=update_colors()["text_color"])
+            search_field.cursor_color = colors["text_color"]
             divider.color = colors["border_color"]
 
             # Обновление иконок в top_rectangle
@@ -138,7 +139,7 @@ class Main_page(Navigation):
             # Menu_content.controls[0].border=update_colors()['border_color']
             """Обновление цветов в меню"""
             Menu_content.controls[0].bgcolor = update_colors()['bgcolor']
-            Menu_content.controls[0].border = ft.border.all(2, update_colors()['border_color'])
+            Menu_content.controls[0].border = border.all(2, update_colors()['border_color'])
             Menu_content.controls[0].content.controls[0].content.color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[1].color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[2].content.content.color = update_colors()['text_color']
@@ -151,28 +152,29 @@ class Main_page(Navigation):
             Menu_content.controls[0].content.controls[9].color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[10].content.content.color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[11].content.content.color = update_colors()['text_color']
+            Menu_content.controls[0].content.controls[12].content.content.color = update_colors()['text_color']
             # Категории
             title_catigories.color = colors["text_color"]
             title_total_products.color = colors["text_color"]
             show_conteiner.content.controls[0].controls[0].bgcolor = update_colors()['bgcolor']
-            show_conteiner.content.controls[0].controls[0].border = ft.border.all(2,
-                                                                                  color=update_colors()['border_color'])
+            show_conteiner.content.controls[0].controls[0].border = border.all(2,
+                                                                               color=update_colors()['border_color'])
             show_conteiner.content.controls[0].controls[0].content.content.controls[1].color = update_colors()[
                 'text_color']
 
             show_conteiner.content.controls[1].controls[0].bgcolor = update_colors()['bgcolor']
-            show_conteiner.content.controls[1].controls[0].border = ft.border.all(2,
-                                                                                  color=update_colors()['border_color'])
+            show_conteiner.content.controls[1].controls[0].border = border.all(2,
+                                                                               color=update_colors()['border_color'])
             show_conteiner.content.controls[1].controls[0].content.content.controls[1].color = update_colors()[
                 'text_color']
 
             for card_app in product_card:
                 updated_colors = card_app.update_colors()
                 card_app.container1.bgcolor = updated_colors["bgcolor"]
-                card_app.container1.border = ft.border.all(2, updated_colors["card_border_color"])
+                card_app.container1.border = border.all(2, updated_colors["card_border_color"])
                 # card_app.icon_container_.bgcolor = updated_colors["icon_background_color"]
 
-                card_app.container1.content.controls[0].content.controls[0].border = ft.border.all(2, updated_colors[
+                card_app.container1.content.controls[0].content.controls[0].border = border.all(2, updated_colors[
                     "border_color"])
                 card_app.container1.content.controls[1].color = updated_colors["text_color"]
                 """Нижняя часть карточки"""
@@ -196,7 +198,7 @@ class Main_page(Navigation):
         # Функция для обновления изображений на фоне
         def update_images():
             controls = []
-            instruments = self.instruments_dark if page.theme_mode == ft.ThemeMode.DARK else self.instruments_light
+            instruments = self.instruments_dark if page.theme_mode == ThemeMode.DARK else self.instruments_light
             rows, cols = 20, 50
             for row in range(rows):
                 row_controls = []
@@ -204,28 +206,31 @@ class Main_page(Navigation):
                     if (row + col) % 2 == 0:
                         instrument_image = instruments[(row * cols + col) % len(instruments)]
                         row_controls.append(
-                            ft.Image(
+                            Image(
                                 src="data:image/png;base64," + instrument_image,
                                 width=20,
                                 height=20,
-                                fit=ft.ImageFit.CONTAIN,
+                                fit=ImageFit.CONTAIN,
                             )
                         )
                     else:
-                        row_controls.append(ft.Container(width=50, height=50))
-                controls.append(ft.Row(row_controls, alignment=ft.MainAxisAlignment.CENTER))
-            return ft.Column(controls, alignment=ft.MainAxisAlignment.CENTER)
+                        row_controls.append(Container(width=50, height=50))
+                controls.append(Row(row_controls, alignment=MainAxisAlignment.CENTER))
+            return Column(controls, alignment=MainAxisAlignment.CENTER)
 
         def animate_menu(e):
-            Menu_content.offset = ft.transform.Offset(0, 0) if Menu_content.offset == ft.transform.Offset(-2,
-                                                                                                          0) else ft.transform.Offset(
+            Menu_content.offset = transform.Offset(0, 0) if Menu_content.offset == transform.Offset(-2,
+                                                                                                    0) else transform.Offset(
                 -2, 0)
             Menu_content.update()
 
         def simple_search(e):
             name_product = search_field.value
-            next_page(f"/search/:{name_product}")
-
+            prod_id = []
+            for i in self.search_product(name=name_product):
+                prod_id.append(int(i[0]))
+            basket.products_id = prod_id
+            next_page(f"/search_result")
 
         buttons = []
         for i in range(len(self.button_kat_names)):
@@ -275,124 +280,131 @@ class Main_page(Navigation):
         for i in range(0, len(manufacturer_cards), 2):
             if i + 1 < len(manufacturer_cards):
                 # Если есть две карточки для строки
-                row = ft.Row(
+                row = Row(
                     controls=[
                         manufacturer_cards[i],
                         manufacturer_cards[i + 1]
                     ],
-                    alignment=ft.MainAxisAlignment.CENTER,
+                    alignment=MainAxisAlignment.CENTER,
                     spacing=20,
                 )
             else:
                 # Если последняя карточка без пары
-                row = ft.Row(
+                row = Row(
                     controls=[manufacturer_cards[i]],
-                    alignment=ft.MainAxisAlignment.CENTER,
+                    alignment=MainAxisAlignment.CENTER,
                     spacing=20,
                 )
             rows.append(row)
 
-        buttons_row = ft.Row(
+        buttons_row = Row(
             controls=buttons,
             spacing=20,
-            alignment=ft.MainAxisAlignment.START,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            alignment=MainAxisAlignment.START,
+            vertical_alignment=CrossAxisAlignment.CENTER,
         )
 
-        product_row = ft.Row(
+        product_row = Row(
             controls=[card.card2 for card in product_card],
             spacing=20,
-            alignment=ft.MainAxisAlignment.START,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            alignment=MainAxisAlignment.START,
+            vertical_alignment=CrossAxisAlignment.CENTER,
         )
 
-        Menu_content = ft.Row(
+        Menu_content = Row(
             controls=[
-                ft.Container(
-                    content=ft.Column(
+                Container(
+                    content=Column(
                         [
-                            ft.Container(
-                                content=ft.Text("Категории", size=update_size()["Menu_zag_text_size"],
-                                                color=update_colors()["text_color"]),
-                                padding=ft.padding.only(top=10, left=10),
+                            Container(
+                                content=Text("Категории", size=update_size()["Menu_zag_text_size"],
+                                             color=update_colors()["text_color"]),
+                                padding=padding.only(top=10, left=10),
                             ),
-                            ft.Divider(height=2, color=update_colors()["text_color"]),
-                            ft.Container(
-                                content=ft.TextButton(
-                                    content=ft.Text("Струнные", size=update_size()["Menu_other_text_size"],
-                                                    color=update_colors()["text_color"]),
+                            Divider(height=2, color=update_colors()["text_color"]),
+                            Container(
+                                content=TextButton(
+                                    content=Text("Струнные", size=update_size()["Menu_other_text_size"],
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page("/category/Струнные")),
-                                padding=ft.padding.only(left=10),
+                                padding=padding.only(left=10),
                             ),
-                            ft.Container(
-                                content=ft.TextButton(
-                                    content=ft.Text("Духовые", size=update_size()["Menu_other_text_size"],
-                                                    color=update_colors()["text_color"]),
+                            Container(
+                                content=TextButton(
+                                    content=Text("Духовые", size=update_size()["Menu_other_text_size"],
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page("/category/Духовые")),
-                                padding=ft.padding.only(left=10),
+                                padding=padding.only(left=10),
                             ),
-                            ft.Container(
-                                content=ft.TextButton(
-                                    content=ft.Text("Ударные", size=update_size()["Menu_other_text_size"],
-                                                    color=update_colors()["text_color"]),
+                            Container(
+                                content=TextButton(
+                                    content=Text("Ударные", size=update_size()["Menu_other_text_size"],
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/category/Ударные')),
-                                padding=ft.padding.only(left=10),
+                                padding=padding.only(left=10),
                             ),
-                            ft.Container(
-                                content=ft.TextButton(
-                                    content=ft.Text("Клавишные", size=update_size()["Menu_other_text_size"],
-                                                    color=update_colors()["text_color"]),
+                            Container(
+                                content=TextButton(
+                                    content=Text("Клавишные", size=update_size()["Menu_other_text_size"],
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/category/Клавишные')),
-                                padding=ft.padding.only(left=10),
+                                padding=padding.only(left=10),
                             ),
-                            ft.Container(
-                                content=ft.TextButton(
-                                    content=ft.Text("Электро инструменты", size=update_size()["Menu_other_text_size"],
-                                                    color=update_colors()["text_color"]),
+                            Container(
+                                content=TextButton(
+                                    content=Text("Электро инструменты", size=update_size()["Menu_other_text_size"],
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/category/Электроинструменты')),
-                                padding=ft.padding.only(left=10),
+                                padding=padding.only(left=10),
                             ),
-                            ft.Container(
-                                content=ft.TextButton(
-                                    content=ft.Text("Аксессуары", size=update_size()["Menu_other_text_size"],
-                                                    color=update_colors()["text_color"]),
+                            Container(
+                                content=TextButton(
+                                    content=Text("Аксессуары", size=update_size()["Menu_other_text_size"],
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/category/Аксессуары')),
-                                padding=ft.padding.only(left=10),
+                                padding=padding.only(left=10),
                             ),
-                            ft.Container(
-                                content=ft.TextButton(
-                                    content=ft.Text("Производители", size=update_size()["Menu_other_text_size"],
-                                                    color=update_colors()["text_color"]),
+                            Container(
+                                content=TextButton(
+                                    content=Text("Производители", size=update_size()["Menu_other_text_size"],
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/Производители')),
-                                padding=ft.padding.only(left=10),
+                                padding=padding.only(left=10),
                             ),
-                            ft.Divider(height=2, color=update_colors()["text_color"]),
-                            ft.Container(
-                                content=ft.TextButton(
-                                    content=ft.Text("Главная", size=update_size()["Menu_zag_text_size"],
-                                                    color=update_colors()["text_color"]),
+                            Divider(height=2, color=update_colors()["text_color"]),
+                            Container(
+                                content=TextButton(
+                                    content=Text("Главная", size=update_size()["Menu_zag_text_size"],
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/')),
-                                padding=ft.padding.only(left=10),
+                                padding=padding.only(left=5),
                             ),
-                            ft.Container(
-                                content=ft.TextButton(
-                                    content=ft.Text("Лента товаров", size=update_size()["Menu_zag_text_size"],
-                                                    color=update_colors()["text_color"]),
+                            Container(
+                                content=TextButton(
+                                    content=Text("Лента товаров", size=update_size()["Menu_zag_text_size"],
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/productsfeed')),
-                                padding=ft.padding.only(left=10),
+                                padding=padding.only(left=5),
+                            ),
+                            Container(
+                                content=TextButton(
+                                    content=Text("Расширенный поиск", size=update_size()["Menu_zag_text_size"],
+                                                 color=update_colors()["text_color"]),
+                                    on_click=lambda e: next_page('/search')),
+                                padding=padding.only(left=5),
                             ),
 
                         ],
-                        # scroll=ft.ScrollMode.ALWAYS
+                        # scroll=ScrollMode.ALWAYS
                     ),
                     expand=1,
                     border_radius=15,
-                    alignment=ft.Alignment(-1, 1),
-                    border=ft.border.all(width=2, color=update_colors()["border_color"]),
+                    alignment=Alignment(-1, 1),
+                    border=border.all(width=2, color=update_colors()["border_color"]),
                     bgcolor=update_colors()["bgcolor"],
                 ),
-                ft.Container(
-                    ft.Container(
+                Container(
+                    Container(
                         on_click=animate_menu,
                     ),
                     expand=5
@@ -401,163 +413,161 @@ class Main_page(Navigation):
             expand=True,
             width=page.width,
             height=page.height - 15,
-            offset=ft.transform.Offset(-2, 0),
-            animate_offset=ft.animation.Animation(300),
+            offset=transform.Offset(-2, 0),
+            animate_offset=animation.Animation(300),
         )
 
-        Menu_but = ft.IconButton(icon=ft.icons.MENU,
-                                 icon_color=update_colors()["icon_color"],
-                                 icon_size=update_size()["icon_rectangle_size"],
-                                 on_click=animate_menu, )
+        Menu_but = IconButton(icon=icons.MENU,
+                              icon_color=update_colors()["icon_color"],
+                              icon_size=update_size()["icon_rectangle_size"],
+                              on_click=animate_menu, )
         # Верхний прямоугольник
-        icon_but = ft.IconButton(icon=ft.icons.SUNNY, on_click=style_revert, icon_color=update_colors()["icon_color"],
+        icon_but = IconButton(icon=icons.SUNNY, on_click=style_revert, icon_color=update_colors()["icon_color"],
+                              icon_size=update_size()['icon_rectangle_size'])
+        Cart_button = IconButton(icon=icons.SHOPPING_CART, icon_color=update_colors()["icon_color"],
                                  icon_size=update_size()['icon_rectangle_size'])
-        Cart_button = ft.IconButton(icon=ft.icons.SHOPPING_CART, icon_color=update_colors()["icon_color"],
-                                    icon_size=update_size()['icon_rectangle_size'])
-        Profile_button = ft.IconButton(icon=ft.icons.PERSON, icon_color=update_colors()["icon_color"],
-                                       icon_size=update_size()['icon_rectangle_size'], on_click=profile_muve)
+        Profile_button = IconButton(icon=icons.PERSON, icon_color=update_colors()["icon_color"],
+                                    icon_size=update_size()['icon_rectangle_size'], on_click=profile_muve)
         """Menu content"""
-        name_shop = ft.Text(
+        name_shop = Text(
             "Music Store",
             size=70,
-            weight=ft.FontWeight.BOLD,
+            weight=FontWeight.BOLD,
             color=update_colors()["text_color"],
         )
 
-        search_button = ft.IconButton(
-            icon=ft.icons.SEARCH,
-            icon_size=20,
-            icon_color=update_colors()["icon_color"],
-            on_click=simple_search
-        )
-
-        search_field = ft.TextField(
-            hint_text="Поиск",
+        search_field = TextField(
+            label="Поиск по названию",
             height=40,
             width=700,
             border_radius=15,
             bgcolor=update_colors()["bgcolor"],
             border_color=update_colors()["border_color"],
             color=update_colors()["text_color"],
-            text_style=ft.TextStyle(size=16),
-            suffix=search_button,
+            text_style=TextStyle(size=16),
+            suffix_icon=IconButton(icon=icons.SEARCH,
+                                   icon_size=20,
+                                   icon_color=update_colors()["icon_color"],
+                                   on_click=simple_search),
+            label_style=TextStyle(color=update_colors()["text_color"]),
+            cursor_color=update_colors()["text_color"],
         )
 
         """Полоска разделитель"""
-        divider = ft.Divider(height=update_size()["divider_size"], color=update_colors()["border_color"])
+        divider = Divider(height=update_size()["divider_size"], color=update_colors()["border_color"])
 
-        top_rectangle = ft.Container(
-            content=ft.Row(
+        top_rectangle = Container(
+            content=Row(
                 [
                     Menu_but,
-                    ft.Row(
+                    Row(
                         [icon_but, Cart_button, Profile_button],
-                        alignment=ft.MainAxisAlignment.END,
+                        alignment=MainAxisAlignment.END,
                         spacing=10,
                     ),
                 ],
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                alignment=MainAxisAlignment.SPACE_BETWEEN,
             ),
         )
-        title_catigories = ft.Text("Популярные категории", color=update_colors()["text_color"],
-                                   size=update_size()["Title_size"])
-        title_total_products = ft.Text("Популярные товары", color=update_colors()["text_color"],
-                                       size=update_size()["Title_size"])
-        title_manufacture = ft.Text("Производители", color=update_colors()["text_color"],
+        title_catigories = Text("Популярные категории", color=update_colors()["text_color"],
+                                size=update_size()["Title_size"])
+        title_total_products = Text("Популярные товары", color=update_colors()["text_color"],
                                     size=update_size()["Title_size"])
-        icon_back = ft.Container(content=update_images(), expand=True)
+        title_manufacture = Text("Производители", color=update_colors()["text_color"],
+                                 size=update_size()["Title_size"])
+        icon_back = Container(content=update_images(), expand=True)
         """Популярные категории и товары"""
-        show_conteiner = ft.Container(
-            content=ft.Column(
+        show_conteiner = Container(
+            content=Column(
                 controls=[
-                    ft.Row(controls=[
-                        ft.Container(
-                            content=ft.Container(
-                                content=ft.Column(
+                    Row(controls=[
+                        Container(
+                            content=Container(
+                                content=Column(
                                     controls=[
                                         title_catigories,
-                                        ft.Divider(height=2, color=update_colors()['text_color']),
-                                        ft.Row(
-                                            controls=[ft.Container(content=buttons_row, height=215,
-                                                                   alignment=ft.Alignment(0, -1))],
-                                            scroll=ft.ScrollMode.AUTO,
+                                        Divider(height=2, color=update_colors()['text_color']),
+                                        Row(
+                                            controls=[Container(content=buttons_row, height=215,
+                                                                alignment=Alignment(0, -1))],
+                                            scroll=ScrollMode.AUTO,
                                         ),
                                     ],
                                     expand=True,
                                 ),
-                                padding=ft.padding.only(left=10, right=10, top=10, bottom=10),
+                                padding=padding.only(left=10, right=10, top=10, bottom=10),
                             ),
-                            border=ft.border.all(width=2, color=update_colors()["border_color"]),
+                            border=border.all(width=2, color=update_colors()["border_color"]),
                             bgcolor=update_colors()["bgcolor"],
                             border_radius=10,
-                            alignment=ft.Alignment(0, 0),
+                            alignment=Alignment(0, 0),
                             height=310,
                             width=page.width - 300,
                         ),
                     ],
-                        alignment=ft.MainAxisAlignment.CENTER,
+                        alignment=MainAxisAlignment.CENTER,
                     ),
-                    ft.Row([
-                        ft.Container(
-                            content=ft.Container(
-                                content=ft.Column(
+                    Row([
+                        Container(
+                            content=Container(
+                                content=Column(
                                     controls=[
                                         title_total_products,
-                                        ft.Divider(height=2, color=ft.colors.BLUE),
-                                        ft.Row(
-                                            controls=[ft.Container(content=product_row, height=380,
-                                                                   alignment=ft.Alignment(0, -1))],
-                                            scroll=ft.ScrollMode.ALWAYS,
+                                        Divider(height=2, color=colors.BLUE),
+                                        Row(
+                                            controls=[Container(content=product_row, height=380,
+                                                                alignment=Alignment(0, -1))],
+                                            scroll=ScrollMode.ALWAYS,
                                         ),
                                     ],
                                     expand=True,
                                 ),
-                                padding=ft.padding.only(left=10, right=10, top=10, bottom=10),
+                                padding=padding.only(left=10, right=10, top=10, bottom=10),
                             ),
-                            border=ft.border.all(width=2, color=update_colors()["border_color"]),
+                            border=border.all(width=2, color=update_colors()["border_color"]),
                             border_radius=10,
-                            alignment=ft.Alignment(0, 0),
+                            alignment=Alignment(0, 0),
                             height=470,
                             width=page.width - 300,
                             bgcolor=update_colors()["bgcolor"],
                         ),
                     ],
-                        alignment=ft.MainAxisAlignment.CENTER,
+                        alignment=MainAxisAlignment.CENTER,
                     ),
-                    ft.Container(content=title_manufacture, alignment=Alignment(0, 0), expand=True),
-                    ft.Divider(height=2, color=update_colors()["border_color"]),
-                    ft.Container(
-                        content=ft.Column(
+                    Container(content=title_manufacture, alignment=Alignment(0, 0), expand=True),
+                    Divider(height=2, color=update_colors()["border_color"]),
+                    Container(
+                        content=Column(
                             controls=rows,
-                            alignment=ft.MainAxisAlignment.CENTER,
+                            alignment=MainAxisAlignment.CENTER,
                         ),
-                        alignment=ft.Alignment(0, 0),
+                        alignment=Alignment(0, 0),
                         expand=True,
                     )
                 ],
                 spacing=10,
-                scroll=ft.ScrollMode.ALWAYS,
+                scroll=ScrollMode.ALWAYS,
             ),
             width=page.width,
             height=page.height / 1.42,
-            # padding=ft.padding.only(bottom=10),
-            # border=ft.border.all(width=2, color='white'),
+            # padding=padding.only(bottom=10),
+            # border=border.all(width=2, color='white'),
         )
 
         """Популярные товары"""
 
-        content = ft.Stack(
+        content = Stack(
             [
-                ft.Column(
+                Column(
                     [
                         top_rectangle,
-                        ft.Container(content=name_shop, alignment=ft.Alignment(0, 0), padding=ft.padding.only(top=20)),
-                        ft.Row(
+                        Container(content=name_shop, alignment=Alignment(0, 0), padding=padding.only(top=20)),
+                        Row(
                             [search_field],
-                            alignment=ft.MainAxisAlignment.CENTER,
+                            alignment=MainAxisAlignment.CENTER,
                         ),
-                        ft.Container(content=divider, alignment=ft.Alignment(0, 0), padding=ft.padding.only(top=20)),
-                        ft.Stack(
+                        Container(content=divider, alignment=Alignment(0, 0), padding=padding.only(top=20)),
+                        Stack(
                             [
                                 icon_back,
                                 show_conteiner,
@@ -571,4 +581,4 @@ class Main_page(Navigation):
             ]
         )
 
-        return ft.View("/", controls=[content])
+        return View("/", controls=[content])

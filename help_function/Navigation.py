@@ -300,16 +300,16 @@ class Navigation:
             print(f"Произошла ошибка при подключении: {e}")
             return None
 
-    def search_product_simple(self, name_product: str):
+    def search_product(self, name=None, category=None, min_price=None, max_price=None, manufacturer=None, color=None, sort_by=None ):
         try:
             response = requests.post('http://localhost:30000/search', json={
-                "search_term": name_product,
-                "category": None,
-                "min_price": None,
-                "max_price": None,
-                "manufacturer": None,
-                "color": None,
-                "sort_by": None
+                "search_term": name,
+                "category": category,
+                "min_price": min_price,
+                "max_price": max_price,
+                "manufacturer": manufacturer,
+                "color": color,
+                "sort_by": sort_by
             }
             )
 
