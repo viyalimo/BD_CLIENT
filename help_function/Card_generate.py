@@ -51,7 +51,7 @@ class Card_generate:
         # self.icon_container_.update()
 
         if e.data == 'true':
-            for __ in range(1):
+            for __ in range(0):
                 self.card1.elevation += 1
                 self.card1.update()
 
@@ -63,7 +63,7 @@ class Card_generate:
             # self.icon_container_.update()
 
         else:
-            for __ in range(1):
+            for __ in range(0):
                 self.card1.elevation -= 1
                 self.card1.update()
 

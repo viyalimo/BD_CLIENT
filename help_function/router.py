@@ -8,7 +8,9 @@ from View.Update_CON import ImageApp
 from View.card_product import Card_product
 from View.manufacture_choose import ManufacturePage
 from View.manufacture_product import ManufactureProd
-
+from View.product_feed import ProductFeed
+from View.User_profile import UserPage
+from View.search_result import SimpleSearch
 
 class Router:
     def __init__(self, page: ft.Page):
@@ -26,6 +28,9 @@ class Router:
             path(url='/loading', clear=False, view=ImageApp().view),
             path(url='/cardinfo/:id', clear=False, view=Card_product().view),
             path(url='/manufacture/:id', clear=False, view=ManufactureProd().view),
+            path(url='/productsfeed', clear=False, view=ProductFeed().view),
+            path(url='/profile', clear=False, view=UserPage().view),
+            path(url='/search/:name', clear=False, view=SimpleSearch().view),
         ]
         self.page = page
 

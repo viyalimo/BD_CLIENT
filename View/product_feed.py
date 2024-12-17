@@ -3,9 +3,8 @@ from help_function.Card_generate import Card_generate
 from flet_route import Params, Basket
 from help_function.Navigation import Navigation
 
-class CategoryPage(Navigation):
-    def __init__(self, category_name: str):
-        self.name_category = category_name
+class ProductFeed(Navigation):
+    def __init__(self):
         self.instruments_light = [
             self.get_image(r"drum_light", "png", "LIGHT"),
             self.get_image(r"electro_light", "png", "LIGHT"),
@@ -314,7 +313,7 @@ class CategoryPage(Navigation):
                 alignment=MainAxisAlignment.SPACE_BETWEEN,
             ),
         )
-        Category_title = Text(self.name_category, size=70, weight=FontWeight.BOLD, color=update_colors()["text_color"],)
+        Category_title = Text("Лента товаров", size=70, weight=FontWeight.BOLD, color=update_colors()["text_color"],)
         divider = Divider(height=update_size()["divider_size"], color=update_colors()["border_color"])
         first_part = Column(
             [
@@ -327,7 +326,7 @@ class CategoryPage(Navigation):
         icon_back = Container(content=update_images(), expand=True)
 
         "Создание карточек с товарами"
-        products = self.get_products_categoryes(self.name_category)
+        products = self.get_all_products()
         product_card = []
         prroduct_row = []
         if products:
@@ -373,7 +372,7 @@ class CategoryPage(Navigation):
             height=page.height / 1.36,
         )
         """соединение всех элементов страницы"""
-        return View("/", controls=[
+        return View("/productsfeed", controls=[
             Stack([
                 Column(
                     controls=[

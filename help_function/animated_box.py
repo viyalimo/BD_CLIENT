@@ -83,6 +83,6 @@ class SendData(AnimatedBox):
         self.page.run_task(self.whileStartAnimatedBox)
 
     async def whileStartAnimatedBox(self):
-        await self.startAnimatedBox(timeout=1)
+        await self.startAnimatedBox(timeout=0.5)
         self.update()
         self.page.go(f"{str(self.PTH)}")

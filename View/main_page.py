@@ -52,6 +52,18 @@ class Main_page(Navigation):
 
         self.get_products_total()
 
+        def next_page(muve):
+            page.theme_mode = ft.ThemeMode.DARK
+            page.client_storage.set("muve", muve)
+            page.go("/loading")
+
+        def profile_muve(e):
+            if page.client_storage.get("key") == None:
+                next_page("/login")
+            else:
+                next_page("/profile")
+
+
         # Функция для конвертации Base64 в изображение
         def image_from_base64(base64_str: str):
             return ft.Image(src=f"data:image/jpeg;base64,{base64_str}", width=200, height=200)
@@ -210,10 +222,10 @@ class Main_page(Navigation):
                 -2, 0)
             Menu_content.update()
 
-        def next_page(muve):
-            page.theme_mode = ft.ThemeMode.DARK
-            page.client_storage.set("muve", muve)
-            page.go("/loading")
+        def simple_search(e):
+            name_product = search_field.value
+            next_page(f"/search/:{name_product}")
+
 
         buttons = []
         for i in range(len(self.button_kat_names)):
@@ -366,7 +378,7 @@ class Main_page(Navigation):
                                 content=ft.TextButton(
                                     content=ft.Text("Лента товаров", size=update_size()["Menu_zag_text_size"],
                                                     color=update_colors()["text_color"]),
-                                    on_click=lambda e: next_page('/')),
+                                    on_click=lambda e: next_page('/productsfeed')),
                                 padding=ft.padding.only(left=10),
                             ),
 
@@ -403,7 +415,7 @@ class Main_page(Navigation):
         Cart_button = ft.IconButton(icon=ft.icons.SHOPPING_CART, icon_color=update_colors()["icon_color"],
                                     icon_size=update_size()['icon_rectangle_size'])
         Profile_button = ft.IconButton(icon=ft.icons.PERSON, icon_color=update_colors()["icon_color"],
-                                       icon_size=update_size()['icon_rectangle_size'])
+                                       icon_size=update_size()['icon_rectangle_size'], on_click=profile_muve)
         """Menu content"""
         name_shop = ft.Text(
             "Music Store",
@@ -416,6 +428,7 @@ class Main_page(Navigation):
             icon=ft.icons.SEARCH,
             icon_size=20,
             icon_color=update_colors()["icon_color"],
+            on_click=simple_search
         )
 
         search_field = ft.TextField(
@@ -492,9 +505,9 @@ class Main_page(Navigation):
                                         title_total_products,
                                         ft.Divider(height=2, color=ft.colors.BLUE),
                                         ft.Row(
-                                            controls=[ft.Container(content=product_row, height=215,
+                                            controls=[ft.Container(content=product_row, height=380,
                                                                    alignment=ft.Alignment(0, -1))],
-                                            scroll=ft.ScrollMode.AUTO,
+                                            scroll=ft.ScrollMode.ALWAYS,
                                         ),
                                     ],
                                     expand=True,

@@ -3,9 +3,8 @@ from help_function.Card_generate import Card_generate
 from flet_route import Params, Basket
 from help_function.Navigation import Navigation
 
-class CategoryPage(Navigation):
-    def __init__(self, category_name: str):
-        self.name_category = category_name
+class SimpleSearch(Navigation):
+    def __init__(self):
         self.instruments_light = [
             self.get_image(r"drum_light", "png", "LIGHT"),
             self.get_image(r"electro_light", "png", "LIGHT"),
@@ -28,6 +27,7 @@ class CategoryPage(Navigation):
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.theme_mode = ThemeMode.DARK
+        search_product_name = params.get("name")[1:]
 
         def next_page(muve):
             page.theme_mode = ThemeMode.DARK
@@ -314,7 +314,7 @@ class CategoryPage(Navigation):
                 alignment=MainAxisAlignment.SPACE_BETWEEN,
             ),
         )
-        Category_title = Text(self.name_category, size=70, weight=FontWeight.BOLD, color=update_colors()["text_color"],)
+        Category_title = Text("Результаты поиска", size=70, weight=FontWeight.BOLD, color=update_colors()["text_color"],)
         divider = Divider(height=update_size()["divider_size"], color=update_colors()["border_color"])
         first_part = Column(
             [
@@ -327,7 +327,7 @@ class CategoryPage(Navigation):
         icon_back = Container(content=update_images(), expand=True)
 
         "Создание карточек с товарами"
-        products = self.get_products_categoryes(self.name_category)
+        products = self.search_product_simple(search_product_name)
         product_card = []
         prroduct_row = []
         if products:
@@ -335,12 +335,12 @@ class CategoryPage(Navigation):
                 id_product = product[0]
                 name = product[1]
                 category = product[2]
-                brand = product[3]
-                price = product[4]
-                quantity = product[5]
-                color = product[6]
-                image_base64 = product[7]
-                warehouse = product[8]
+                price = product[3]
+                quantity = product[4]
+                color = product[5]
+                image_base64 = product[6]
+                warehouse = product[7]
+                brand = product[8]
 
                 app = Card_generate(id_product, name, price, image_from_base64(image_base64), category, quantity, page, brand)
 
@@ -373,7 +373,7 @@ class CategoryPage(Navigation):
             height=page.height / 1.36,
         )
         """соединение всех элементов страницы"""
-        return View("/", controls=[
+        return View("/search/:name", controls=[
             Stack([
                 Column(
                     controls=[

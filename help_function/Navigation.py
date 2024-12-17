@@ -2,10 +2,13 @@ from functools import lru_cache
 import requests
 import io
 import base64
+from help_function.Crypt import Crypt
+
 
 class Navigation:
     host = "localhost"
     port = 30000
+
     def __init__(self):
         pass
 
@@ -17,7 +20,7 @@ class Navigation:
             return base_64_image
         else:
             request = requests.get(
-                f"http://{self.host}:{self.port}/{name}.{val}")
+                f"http://{self.host}:{self.port}/images/{name}.{val}")
             image = io.BytesIO(request.content)
             base_64_image = base64.b64encode(image.read()).decode()
             return base_64_image
@@ -42,7 +45,8 @@ class Navigation:
 
     def get_products_categoryes(self, name_category):
         try:
-            response = requests.get(f"http://{self.host}:{self.port}/products/category/{name_category.replace(' ', '')}")
+            response = requests.get(
+                f"http://{self.host}:{self.port}/products/category/{name_category.replace(' ', '')}")
 
             # Проверка успешного ответа от сервера (HTTP 200)
             if response.status_code == 200:
@@ -78,6 +82,26 @@ class Navigation:
 
         except requests.exceptions.RequestException as e:
             print(f"Произошла ошибка при подключении: {e}")
+
+    import requests
+
+    def get_all_products(self):
+        try:
+            response = requests.get(f"http://{self.host}:{self.port}/products")
+
+            if response.status_code == 200:
+                data = response.json()
+                return data['products']
+            elif response.status_code == 404:
+                print("Продукты не найдены.")
+                return None
+            else:
+                print(f"Ошибка: {response.status_code} - {response.reason}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            print(f"Произошла ошибка при подключении: {e}")
+            return None
 
     def get_all_manufacturers(self):
         try:
@@ -146,3 +170,158 @@ class Navigation:
             print(f"Произошла ошибка при подключении: {e}")
             return None
 
+    def get_user_info(self, user_name, key):
+        try:
+            response = requests.get(f"http://{self.host}:{self.port}/profile/{user_name}/{key}")
+            if response.status_code == 200:
+                if isinstance(response.json(), str):
+                    return response.json()
+                else:
+                    data = response.json()["inf"]
+                    data = Crypt().decrypt_message(key, data)
+                    data = data.split(",")
+                    if isinstance(data, list):
+                        return data
+                    else:
+                        return data
+            elif response.status_code == 404:
+                print(f"Произошла ошибка!")
+                return None
+            else:
+                print(f"Ошибка: {response.status_code} - {response.reason}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            print(f"Произошла ошибка при подключении: {e}")
+            return None
+
+    def update_photo(self, photo, key, id):
+        try:
+            muve = ["photo", photo]
+            response = requests.post('http://localhost:30000/editprofile', json={
+                "id": id,
+                "muve": muve,
+                "key": key
+            })
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 404:
+                print(f"Произошла ошибка!")
+                return None
+            else:
+                print(f"Ошибка: {response.status_code} - {response.reason}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            print(f"Произошла ошибка при подключении: {e}")
+            return None
+
+    def update_password(self, new_password, key, id):
+        try:
+            muve = ["password", new_password]
+            response = requests.post('http://localhost:30000/editprofile', json={
+                "id": id,
+                "muve": muve,
+                "key": key
+            })
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 404:
+                print(f"Произошла ошибка!")
+                return None
+            else:
+                print(f"Ошибка: {response.status_code} - {response.reason}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            print(f"Произошла ошибка при подключении: {e}")
+            return None
+
+    def update_phone(self, number, key, id):
+        try:
+            muve = ["phone", number]
+            response = requests.post('http://localhost:30000/editprofile', json={
+                "id": id,
+                "muve": muve,
+                "key": key
+            })
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 404:
+                print(f"Произошла ошибка!")
+                return None
+            else:
+                print(f"Ошибка: {response.status_code} - {response.reason}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            print(f"Произошла ошибка при подключении: {e}")
+            return None
+
+    def LOG_OUT(self, key, id):
+        try:
+            muve = ["logout"]
+            response = requests.post('http://localhost:30000/editprofile', json={
+                "id": id,
+                "muve": muve,
+                "key": key
+            })
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 404:
+                print(f"Произошла ошибка!")
+                return None
+            else:
+                print(f"Ошибка: {response.status_code} - {response.reason}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            print(f"Произошла ошибка при подключении: {e}")
+            return None
+
+    def DELETE_ACCOUNT(self, key, id):
+        try:
+            muve = ["delete"]
+            response = requests.post('http://localhost:30000/editprofile', json={
+                "id": id,
+                "muve": muve,
+                "key": key
+            })
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 404:
+                print(f"Произошла ошибка!")
+                return None
+            else:
+                print(f"Ошибка: {response.status_code} - {response.reason}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            print(f"Произошла ошибка при подключении: {e}")
+            return None
+
+    def search_product_simple(self, name_product: str):
+        try:
+            response = requests.post('http://localhost:30000/search', json={
+                "search_term": name_product,
+                "category": None,
+                "min_price": None,
+                "max_price": None,
+                "manufacturer": None,
+                "color": None,
+                "sort_by": None
+            }
+            )
+
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 404:
+                print(f"Произошла ошибка!")
+                return None
+            else:
+                print(f"Ошибка: {response.status_code} - {response.reason}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            print(f"Произошла ошибка при подключении: {e}")
+            return None

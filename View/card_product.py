@@ -38,6 +38,17 @@ class Card_product(Navigation):
         id_product = int(params.get("id")[1:])
         self.name, self.category, self.brand, self.price, self.quantity, self.color, self.image_base64, self.warehouse = self.get_product_id(id_product)[1:]
 
+        def next_page(muve):
+            page.theme_mode = ThemeMode.DARK
+            page.client_storage.set("muve", muve)
+            page.go("/loading")
+
+        def profile_muve(e):
+            if page.client_storage.get("key") == None:
+                next_page("/login")
+            else:
+                next_page("/profile")
+
         def image_from_base64(base64_str: str):
             return Image(src=f"data:image/jpeg;base64,{base64_str}", width=800, height=800)
 
@@ -303,7 +314,7 @@ class Card_product(Navigation):
                                 content=TextButton(
                                     content=Text("Лента товаров", size=update_size()["Menu_zag_text_size"],
                                                  color=update_colors()["text_color"]),
-                                    on_click=lambda e: next_page('/')),
+                                    on_click=lambda e: next_page('/productsfeed')),
                                 padding=padding.only(left=10),
                             ),
                         ],
@@ -341,7 +352,8 @@ class Card_product(Navigation):
                                  icon_size=update_size()['icon_rectangle_size'])
         """profile"""
         Profile_button = IconButton(icon=Icons.PERSON, icon_color=update_colors()["icon_color"],
-                                    icon_size=update_size()['icon_rectangle_size'])
+                                    icon_size=update_size()['icon_rectangle_size'],
+                                    on_click=profile_muve)
         """top rectangle"""
         top_rectangle = Container(
             content=Row(

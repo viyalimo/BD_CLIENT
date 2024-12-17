@@ -2,6 +2,7 @@ import flet as ft
 from flet_route import Params, Basket
 import requests
 from help_function.Navigation import Navigation
+import json
 
 class LoginPage(Navigation):
     def __init__(self):
@@ -38,18 +39,20 @@ class LoginPage(Navigation):
                 "username": name.current.value,
                 "password": password.current.value
             })
-            if responce.text[1:-1] == "Аутентификация успешна":
+            responce = json.loads(responce.content.decode('utf-8'))
+            if responce[0] == "key":
                 page.snack_bar = ft.SnackBar(
                     content=ft.Row([ft.Text("Вы успешно вошли!", color='white')],
                                    alignment=ft.MainAxisAlignment.CENTER),
                     bgcolor=ft.colors.GREEN,
 
                 )
+                page.client_storage.set("key", [responce[1], name.current.value])
                 page.snack_bar.open = True
-                page.go('/')
+                next_page('/profile')
             else:
                 page.snack_bar = ft.SnackBar(
-                    content=ft.Row([ft.Text(f"{responce.text[1:-1]}", color='white')],
+                    content=ft.Row([ft.Text(f"{responce}", color='white')],
                                    alignment=ft.MainAxisAlignment.CENTER),
                     bgcolor=ft.colors.RED,
                 )
@@ -58,6 +61,11 @@ class LoginPage(Navigation):
             password.current.value = ""
             page.update()
             name.current.focus()
+
+        def next_page(muve):
+            page.theme_mode = ft.ThemeMode.DARK
+            page.client_storage.set("muve", muve)
+            page.go("/loading")
 
         # Списки изображений для светлой и тёмной темы
         instruments_light = [
@@ -117,7 +125,9 @@ class LoginPage(Navigation):
                                                                side=ft.BorderSide(color=ft.colors.BLUE, width=1),
                                                                shape=ft.RoundedRectangleBorder(radius=12))),
                         ft.TextButton(text="Зарегистрироваться", style=ft.ButtonStyle(color=ft.colors.BLUE),
-                                      on_click=lambda _: page.go('/signup')),
+                                      on_click=lambda _: next_page('/signup')),
+                        ft.TextButton(text="на главную", style=ft.ButtonStyle(color=ft.colors.BLUE),
+                                      on_click=lambda _: next_page('/')),
                     ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
                 ], alignment=ft.MainAxisAlignment.CENTER, expand=True), height=500, width=400,
                     border=ft.border.all(1, ft.colors.BLUE), border_radius=10, padding=20, blur=ft.Blur(10, 10))

@@ -2,6 +2,7 @@ import flet as ft
 from flet_route import Params, Basket
 import requests
 from help_function.Navigation import Navigation
+import json
 
 
 class SignupPage(Navigation):
@@ -16,6 +17,11 @@ class SignupPage(Navigation):
         re_enter_password = ft.Ref[ft.TextField]()
         page.theme_mode = ft.ThemeMode.DARK
         back_image = self.get_image("Dark", "jpg")
+
+        def next_page(muve):
+            page.theme_mode = ft.ThemeMode.DARK
+            page.client_storage.set("muve", muve)
+            page.go("/loading")
 
         def btn_click(e):
             if not name.current.value:
@@ -97,14 +103,26 @@ class SignupPage(Navigation):
                 re_enter_password.current.focus()
                 page.update()
                 return
-
-            responce = requests.post('http://192.168.0.105:30000/register', json={
+            if re_enter_password.current.value != password.current.value:
+                page.snack_bar = ft.SnackBar(
+                    content=ft.Row([
+                        ft.Text('Пароли не совпали!', color='white')
+                    ], alignment=ft.MainAxisAlignment.CENTER
+                    ),
+                    bgcolor=ft.colors.RED,
+                )
+                page.snack_bar.open = True
+                re_enter_password.current.focus()
+                re_enter_password.current.value = ""
+                page.update()
+                return
+            responce = requests.post('http://localhost:30000/register', json={
                 "username": name.current.value,
                 "password": password.current.value,
                 "phone_number": str(phone_number.current.value),
             })
-
-            if responce.text[1:-1] == "Пользователь успешно зарегистрирован":
+            responce = json.loads(responce.content.decode('utf-8'))
+            if responce[0] == "key":
                 page.snack_bar = ft.SnackBar(
                     content=ft.Row([
                         ft.Text('Вы успешно зарегестрировались!', color='white')
@@ -112,17 +130,20 @@ class SignupPage(Navigation):
                     ),
                     bgcolor=ft.colors.GREEN,
                 )
+                page.client_storage.set("key", [responce[1], name.current.value])
                 page.snack_bar.open = True
-                page.go('/')
+                next_page('/profile')
             else:
                 page.snack_bar = ft.SnackBar(
                     content=ft.Row([
-                        ft.Text(f"{responce.text[1:-1]}", color='white')
+                        ft.Text(f"{responce}", color='white')
                     ], alignment=ft.MainAxisAlignment.CENTER
                     ),
                     bgcolor=ft.colors.RED,
                 )
                 page.snack_bar.open = True
+                name.current.value = ""
+                page.update()
             name.current.value = ""
             phone_number.current.value = ""
             password.current.value = ""
@@ -235,7 +256,14 @@ class SignupPage(Navigation):
                                           style=ft.ButtonStyle(
                                               color=ft.colors.BLUE,
                                           ),
-                                          on_click=lambda _: page.go('/login')),
+                                          on_click=lambda _: next_page('/login')),
+
+                            ft.TextButton(text="на главную",
+                                          style=ft.ButtonStyle(
+                                              color=ft.colors.BLUE,
+                                          ),
+                                          on_click=lambda _: next_page('/')),
+
 
                         ],
                         alignment=ft.MainAxisAlignment.CENTER,
