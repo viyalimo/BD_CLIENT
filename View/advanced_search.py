@@ -58,6 +58,12 @@ class AdvancedSearchPage(Navigation):
             else:
                 next_page("/profile")
 
+        def cart_muve(e):
+            if page.client_storage.get("key") == None:
+                next_page("/login")
+            else:
+                next_page("/cart")
+
         def update_colors():
             if page.theme_mode == ThemeMode.LIGHT:
                 return {
@@ -178,6 +184,7 @@ class AdvancedSearchPage(Navigation):
             sorted_dropdown.label_style = TextStyle(color=update_colors()["text_color"])
 
             search_button.icon_color = colors["text_color"]
+            Label.color = colors["text_color"]
 
             icon_back.content = update_images()
             for card_app in product_card:
@@ -374,7 +381,8 @@ class AdvancedSearchPage(Navigation):
         icon_but = IconButton(icon=icons.SUNNY, on_click=style_revert, icon_color=update_colors()["icon_color"],
                               icon_size=update_size()['icon_rectangle_size'])
         Cart_button = IconButton(icon=icons.SHOPPING_CART, icon_color=update_colors()["icon_color"],
-                                 icon_size=update_size()['icon_rectangle_size'])
+                                 icon_size=update_size()['icon_rectangle_size'],
+                                 on_click=lambda e: cart_muve(e))
         Profile_button = IconButton(icon=icons.PERSON, icon_color=update_colors()["icon_color"],
                                     icon_size=update_size()['icon_rectangle_size'], on_click=profile_muve)
 
@@ -493,7 +501,7 @@ class AdvancedSearchPage(Navigation):
         )
         search_button = ElevatedButton(text="Искать", on_click=lambda e: research(e), width=400)
 
-        Label = Text("Расширенный поиск", size=50)
+        Label = Text("Расширенный поиск", size=50, color = update_colors()["text_color"])
         Label_container = Container(
             content=Label,
             alignment=Alignment(0, 0),

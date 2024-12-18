@@ -1,6 +1,6 @@
 import datetime
 import time
-
+import socket
 import flet as ft
 import requests
 import base64
@@ -10,6 +10,9 @@ import asyncio
 
 
 class AnimatedBox(ft.Container):
+    # host = socket.gethostbyname(socket.gethostname())
+    host = "localhost"
+    port = 30000
     def __init__(self, STILE_MODE: str, **kwargs):
         ft.Container.__init__(self, **kwargs)
         self.instruments_light = [
@@ -37,7 +40,7 @@ class AnimatedBox(ft.Container):
     @lru_cache
     def get_image(self, name, style, val):
         # Загружаем изображение через API
-        request = requests.get(f" http://localhost:30000/images/{style}/{name}.{val}")
+        request = requests.get(f"http://{self.host}:{self.port}/images/{style}/{name}.{val}")
         base_64_image = base64.b64encode(io.BytesIO(request.content).read()).decode()
         return f"data:image/{val};base64,{base_64_image}"
 
@@ -83,6 +86,6 @@ class SendData(AnimatedBox):
         self.page.run_task(self.whileStartAnimatedBox)
 
     async def whileStartAnimatedBox(self):
-        await self.startAnimatedBox(timeout=0.1)
+        await self.startAnimatedBox(timeout=0)
         self.update()
         self.page.go(f"{str(self.PTH)}")

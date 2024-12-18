@@ -41,6 +41,12 @@ class AdvancedSearch(Navigation):
             else:
                 next_page("/profile")
 
+        def cart_muve(e):
+            if page.client_storage.get("key") == None:
+                next_page("/login")
+            else:
+                next_page("/cart")
+
         def image_from_base64(base64_str: str):
             return Image(src=f"data:image/jpeg;base64,{base64_str}", width=200, height=200)
 
@@ -324,7 +330,8 @@ class AdvancedSearch(Navigation):
         icon_but = IconButton(icon=icons.SUNNY, on_click=style_revert, icon_color=update_colors()["icon_color"],
                               icon_size=update_size()['icon_rectangle_size'])
         Cart_button = IconButton(icon=icons.SHOPPING_CART, icon_color=update_colors()["icon_color"],
-                                 icon_size=update_size()['icon_rectangle_size'])
+                                 icon_size=update_size()['icon_rectangle_size'],
+                                 on_click=lambda e: cart_muve(e))
         Profile_button = IconButton(icon=icons.PERSON, icon_color=update_colors()["icon_color"],
                                     icon_size=update_size()['icon_rectangle_size'],
                                     on_click=profile_muve)

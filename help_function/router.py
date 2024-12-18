@@ -2,6 +2,8 @@ import flet as ft
 from flet_route import Routing, path
 from Authorization.login import LoginPage
 from Authorization.signup import SignupPage
+from View.Orders_page import Orders_page
+from View.history_order_page import History_page
 from View.main_page import Main_page
 from View.Page_category import CategoryPage
 from View.Update_CON import ImageApp
@@ -12,6 +14,7 @@ from View.product_feed import ProductFeed
 from View.User_profile import UserPage
 from View.advanced_search import AdvancedSearchPage
 from View.search_result import AdvancedSearch
+from View.cart_page import CartPage
 
 class Router:
     def __init__(self, page: ft.Page):
@@ -33,6 +36,9 @@ class Router:
             path(url='/profile', clear=False, view=UserPage().view),
             path(url='/search', clear=False, view=AdvancedSearchPage().view),
             path(url='/search_result', clear=False, view=AdvancedSearch().view),
+            path(url='/cart', clear=False, view=CartPage().view),
+            path(url='/active_order', clear=False, view=Orders_page().view),
+            path(url='/history_order', clear=False, view=History_page().view),
         ]
         self.page = page
 

@@ -1,9 +1,11 @@
 from flet import *
-from help_function.manufactures_card import Manufactures_Card
+from help_function.Card_generate import Card_generate
 from flet_route import Params, Basket
 from help_function.Navigation import Navigation
+from help_function.cart_product_generate import Card_Cart
 
-class ManufacturePage(Navigation):
+
+class CartPage(Navigation):
     def __init__(self):
         self.instruments_light = [
             self.get_image(r"drum_light", "png", "LIGHT"),
@@ -27,6 +29,8 @@ class ManufacturePage(Navigation):
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.theme_mode = ThemeMode.DARK
+        key, user_name = page.client_storage.get("key")
+        self.user_id = int(self.get_user_info(user_name, key)[0])
 
         def next_page(muve):
             page.theme_mode = ThemeMode.DARK
@@ -38,12 +42,6 @@ class ManufacturePage(Navigation):
                 next_page("/login")
             else:
                 next_page("/profile")
-
-        def cart_muve(e):
-            if page.client_storage.get("key") == None:
-                next_page("/login")
-            else:
-                next_page("/cart")
 
         def image_from_base64(base64_str: str):
             return Image(src=f"data:image/jpeg;base64,{base64_str}", width=200, height=200)
@@ -107,9 +105,10 @@ class ManufacturePage(Navigation):
             Category_title.color = colors["text_color"]
             divider.color = colors['text_color']
 
-            # Обновление иконок в top_rectangle
-            Cart_button.icon_color = colors["icon_color"]
             Profile_button.icon_color = colors["icon_color"]
+
+            history_cart.icon_color = colors["icon_color"]
+            active_cart.icon_color = colors["icon_color"]
 
             # обновление меню
             Menu_but.icon_color = colors["icon_color"]
@@ -132,6 +131,31 @@ class ManufacturePage(Navigation):
             Menu_content.controls[0].content.controls[10].content.content.color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[11].content.content.color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[12].content.content.color = update_colors()['text_color']
+
+
+            """Обновление карточек"""
+            for card_app in product_card:
+                updated_colors = card_app.update_colors()
+                card_app.container1.bgcolor = updated_colors["bgcolor"]
+                card_app.container1.border = border.all(2, updated_colors["card_border_color"])
+                #card_app.icon_container_.bgcolor = updated_colors["icon_background_color"]
+
+                card_app.container1.content.controls[0].content.controls[0].border = border.all(2, updated_colors[
+                    "border_color"])
+                card_app.container1.content.controls[1].color = updated_colors["text_color"]
+                """Нижняя часть карточки"""
+                card_app.container1.content.controls[2].bgcolor = updated_colors["bgcolor"]
+                card_app.container1.content.controls[2].content.controls[0].controls[0].color = updated_colors["text_color"]
+                card_app.container1.content.controls[2].content.controls[0].controls[1].color = updated_colors["text_color"]
+                card_app.container1.content.controls[2].content.controls[0].controls[2].color = updated_colors["text_color"]
+                card_app.container1.content.controls[2].content.controls[0].controls[3].color = updated_colors["text_color"]
+                card_app.buy_btn.bgcolor = colors["bgcolor"]
+                card_app.basket_btn.bgcolor = colors["bgcolor"]
+
+
+                # Обновляем элементы
+                #card_app.icon_container_.update()
+                card_app.container1.update()
 
             page.update()
 
@@ -157,6 +181,41 @@ class ManufacturePage(Navigation):
                 controls.append(Row(row_controls, alignment=MainAxisAlignment.CENTER))
             return Column(controls, alignment=MainAxisAlignment.CENTER)
 
+        def clear_cart(e):
+            result = self.clear_cart(self.user_id)
+            if result:
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Корзина очищена", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.GREEN,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+                next_page("/cart")
+            else:
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Ошибка при очистке корзины!", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.RED,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+                next_page("/cart")
+
+        def create_card_rows(cards, max_cards_per_row=8):
+            rows = []
+            for i in range(0, len(cards), max_cards_per_row):
+                card_row = cards[i:i + max_cards_per_row]  # Берем срез карточек
+                row = Row(
+                    controls=[card.card2 for card in card_row],  # Добавляем карточки в строку
+                    spacing=20,
+                    alignment=MainAxisAlignment.START,
+                    vertical_alignment=CrossAxisAlignment.CENTER,
+                )
+                rows.append(row)
+            return rows
 
         """Верхняя часть"""
         Menu_content = Row(
@@ -237,7 +296,7 @@ class ManufacturePage(Navigation):
                             Container(
                                 content=TextButton(
                                     content=Text("Расширенный поиск", size=update_size()["Menu_zag_text_size"],
-                                                    color=update_colors()["text_color"]),
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/search')),
                                 padding=padding.only(left=5),
                             ),
@@ -270,19 +329,30 @@ class ManufacturePage(Navigation):
                               on_click=animate_menu)
         icon_but = IconButton(icon=icons.SUNNY, on_click=style_revert, icon_color=update_colors()["icon_color"],
                               icon_size=update_size()['icon_rectangle_size'])
-        Cart_button = IconButton(icon=icons.SHOPPING_CART, icon_color=update_colors()["icon_color"],
-                                 icon_size=update_size()['icon_rectangle_size'],
-                                 on_click=lambda e: cart_muve(e))
+
+
         Profile_button = IconButton(icon=icons.PERSON, icon_color=update_colors()["icon_color"],
                                     icon_size=update_size()['icon_rectangle_size'],
                                     on_click=profile_muve)
+        Clear_cart = IconButton(icon=Icons.CLEANING_SERVICES_OUTLINED, icon_color=update_colors()["icon_color"],
+                                icon_size=update_size()['icon_rectangle_size'], tooltip="Очистить корзину",
+                                on_click=lambda e: clear_cart(e))
+
+        history_cart = IconButton(icon=Icons.HISTORY_OUTLINED, icon_color=update_colors()["icon_color"],
+                                icon_size=update_size()['icon_rectangle_size'], tooltip="История заказов",
+                                on_click=lambda e: next_page("/history_order"))
+
+        active_cart = IconButton(icon=Icons.LOCAL_SHIPPING, icon_color=update_colors()["icon_color"],
+                                  icon_size=update_size()['icon_rectangle_size'], tooltip="Активные заказы",
+                                  on_click=lambda e: next_page("/active_order"))
+
 
         top_rectangle = Container(
             content=Row(
                 [
                     Menu_but,
                     Row(
-                        [icon_but, Cart_button, Profile_button],
+                        [icon_but, Clear_cart, active_cart, history_cart, Profile_button],
                         alignment=MainAxisAlignment.END,
                         spacing=10,
                     ),
@@ -290,7 +360,7 @@ class ManufacturePage(Navigation):
                 alignment=MainAxisAlignment.SPACE_BETWEEN,
             ),
         )
-        Category_title = Text("Производители", size=70, weight=FontWeight.BOLD, color=update_colors()["text_color"],)
+        Category_title = Text("Корзина", size=70, weight=FontWeight.BOLD, color=update_colors()["text_color"],)
         divider = Divider(height=update_size()["divider_size"], color=update_colors()["border_color"])
         first_part = Column(
             [
@@ -303,69 +373,62 @@ class ManufacturePage(Navigation):
         icon_back = Container(content=update_images(), expand=True)
 
         "Создание карточек с товарами"
+        products = []
+        for i in self.get_cart(self.user_id):
+            products.append(self.get_product_id(int(i)))
+        product_card = []
+        prroduct_row = []
+        if products:
+            for product in products:
+                id_product = product[0]
+                name = product[1]
+                category = product[2]
+                brand = product[3]
+                price = product[4]
+                quantity = product[5]
+                color = product[6]
+                image_base64 = product[7]
+                warehouse = product[8]
 
-        manufacture = self.get_all_manufacturers()
-        manufacturer_cards = []
-        if manufacture:
-            for manufacturer in manufacture:
-                id_manufacturer = manufacturer[0]
-                image = manufacturer[2]
+                app = Card_Cart(id_product, name, price, image_from_base64(image_base64), category, quantity, page, brand)
 
-                card_builder = Manufactures_Card(id_manufacturer, image, page)
-                manufacturer_cards.append(card_builder.container)
+
+                product_card.append(app)
+            product_row = create_card_rows(product_card)
         else:
-            pass
+            product_row = []
 
-        rows = []  # Массив строк
-        for i in range(0, len(manufacturer_cards), 2):
-            if i + 1 < len(manufacturer_cards):
-                # Если есть две карточки для строки
-                row = Row(
-                    controls=[
-                        manufacturer_cards[i],
-                        manufacturer_cards[i + 1]
-                    ],
-                    alignment=MainAxisAlignment.CENTER,
-                    spacing=20,
-                )
-            else:
-                # Если последняя карточка без пары
-                row = Row(
-                    controls=[manufacturer_cards[i]],
-                    alignment=MainAxisAlignment.CENTER,
-                    spacing=20,
-                )
-            rows.append(row)
-
-        show_conteiner = Container(
+        card_container = Container(
             content=Column(
                 controls=[
-                    Container(
-                        content=Column(
-                            controls=rows,
-                            alignment=MainAxisAlignment.CENTER,
-                        ),
-                        alignment=Alignment(0, 0),
-                        expand=True,
+                    Row(
+                        controls=[
+                            Container(
+                                content=Column(
+                                    controls=product_row
+                                ),
+                                padding=padding.only(left=50, right=50),
+                                expand=True,
+                            ),
+
+                        ],
+                        scroll=ScrollMode.AUTO,
                     )
                 ],
-                spacing=10,
-                scroll=ScrollMode.ALWAYS,
+                scroll=ScrollMode.ALWAYS
             ),
             width=page.width,
-            height=page.height / 1.42,
-            # padding=padding.only(bottom=10),
-            # border=border.all(width=2, color='white'),
+            height=page.height / 1.36,
         )
         """соединение всех элементов страницы"""
-        return View("/Производители", controls=[
+        return View("/cart", controls=[
             Stack([
                 Column(
                     controls=[
                         first_part,
                         Stack([
                             icon_back,
-                            show_conteiner,
+                            card_container,
                         ])
                     ]
                 ),

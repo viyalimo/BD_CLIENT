@@ -1,10 +1,13 @@
-from flet import *
-from help_function.manufactures_card import Manufactures_Card
-from flet_route import Params, Basket
 from help_function.Navigation import Navigation
+from flet import *
+from help_function.Card_generate import Card_generate
+from flet_route import Params, Basket
+from help_function.Orders_CARD import OrderCard
 
-class ManufacturePage(Navigation):
+
+class Orders_page(Navigation):
     def __init__(self):
+
         self.instruments_light = [
             self.get_image(r"drum_light", "png", "LIGHT"),
             self.get_image(r"electro_light", "png", "LIGHT"),
@@ -23,10 +26,10 @@ class ManufacturePage(Navigation):
         ]
         super().__init__()
 
-
-
     def view(self, page: Page, params: Params, basket: Basket):
         page.theme_mode = ThemeMode.DARK
+        key, user_name = page.client_storage.get("key")
+        self.user_id = int(self.get_user_info(user_name, key)[0])
 
         def next_page(muve):
             page.theme_mode = ThemeMode.DARK
@@ -45,8 +48,6 @@ class ManufacturePage(Navigation):
             else:
                 next_page("/cart")
 
-        def image_from_base64(base64_str: str):
-            return Image(src=f"data:image/jpeg;base64,{base64_str}", width=200, height=200)
 
         def update_colors():
             if page.theme_mode == ThemeMode.LIGHT:
@@ -85,7 +86,8 @@ class ManufacturePage(Navigation):
             }
 
         def animate_menu(e):
-            Menu_content.offset = transform.Offset(0, 0) if Menu_content.offset == transform.Offset(-2, 0) else transform.Offset(
+            Menu_content.offset = transform.Offset(0, 0) if Menu_content.offset == transform.Offset(-2,
+                                                                                                    0) else transform.Offset(
                 -2, 0)
             Menu_content.update()
 
@@ -101,21 +103,17 @@ class ManufacturePage(Navigation):
 
             colors = update_colors()
 
-            icon_back.content = update_images()
-
-            """обновление названия и полоски разделителя"""
             Category_title.color = colors["text_color"]
+            Menu_but.icon_color = colors["icon_color"]
             divider.color = colors['text_color']
 
             # Обновление иконок в top_rectangle
             Cart_button.icon_color = colors["icon_color"]
             Profile_button.icon_color = colors["icon_color"]
 
-            # обновление меню
-            Menu_but.icon_color = colors["icon_color"]
-
-            Menu_content.controls[0].bgcolor=update_colors()['bgcolor']
-            Menu_content.controls[0].border=update_colors()['border_color']
+            icon_back.content = update_images()
+            Menu_content.controls[0].bgcolor = update_colors()['bgcolor']
+            Menu_content.controls[0].border = update_colors()['border_color']
             """Обновление цветов в меню"""
             Menu_content.controls[0].bgcolor = update_colors()['bgcolor']
             Menu_content.controls[0].border = border.all(2, update_colors()['border_color'])
@@ -132,7 +130,6 @@ class ManufacturePage(Navigation):
             Menu_content.controls[0].content.controls[10].content.content.color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[11].content.content.color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[12].content.content.color = update_colors()['text_color']
-
             page.update()
 
         def update_images():
@@ -157,6 +154,32 @@ class ManufacturePage(Navigation):
                 controls.append(Row(row_controls, alignment=MainAxisAlignment.CENTER))
             return Column(controls, alignment=MainAxisAlignment.CENTER)
 
+        def get_orders_list():
+            result = self.get_all_orders(self.user_id)
+            return result
+
+        def update_cards(e):
+            # Очистка текущего списка карточек
+            self.card_list.clear()
+
+            # Получение обновленных данных
+            data_list = get_orders_list()
+
+            for i in data_list:
+                # Пропуск заказов со статусом "canceled"
+                if i[2] == "canceled":
+                    continue
+
+                elif i[2] == "delivered":
+                    continue
+
+                else:
+                    cart = OrderCard(page, i[0], i[1], i[2], i[3], i[4], self.user_id)
+                    self.card_list.append(cart.build())
+
+            # Перерисовка элементов на странице
+            # Например, если используете Flet:
+            next_page("/active_order")
 
         """Верхняя часть"""
         Menu_content = Row(
@@ -223,21 +246,21 @@ class ManufacturePage(Navigation):
                             Container(
                                 content=TextButton(
                                     content=Text("Главная", size=update_size()["Menu_zag_text_size"],
-                                                    color=update_colors()["text_color"]),
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/')),
                                 padding=padding.only(left=5),
                             ),
                             Container(
                                 content=TextButton(
                                     content=Text("Лента товаров", size=update_size()["Menu_zag_text_size"],
-                                                    color=update_colors()["text_color"]),
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/productsfeed')),
                                 padding=padding.only(left=5),
                             ),
                             Container(
                                 content=TextButton(
                                     content=Text("Расширенный поиск", size=update_size()["Menu_zag_text_size"],
-                                                    color=update_colors()["text_color"]),
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/search')),
                                 padding=padding.only(left=5),
                             ),
@@ -290,12 +313,14 @@ class ManufacturePage(Navigation):
                 alignment=MainAxisAlignment.SPACE_BETWEEN,
             ),
         )
-        Category_title = Text("Производители", size=70, weight=FontWeight.BOLD, color=update_colors()["text_color"],)
-        divider = Divider(height=update_size()["divider_size"], color=update_colors()["border_color"])
+        Category_title = Text("Активные заказы", size=70, weight=FontWeight.BOLD, color=update_colors()["text_color"])
+        update_button = ElevatedButton("обновить", on_click=lambda e: update_cards(e))
+        divider = Divider(height=update_size()["divider_size"])
         first_part = Column(
             [
                 top_rectangle,
                 Container(content=Category_title, alignment=Alignment(0, 0), padding=padding.only(top=20)),
+                Container(content=update_button, alignment=Alignment(0, 0), padding=padding.only(top=20)),
                 Container(content=divider, alignment=Alignment(0, 0), padding=padding.only(top=20)),
             ]
         )
@@ -304,68 +329,38 @@ class ManufacturePage(Navigation):
 
         "Создание карточек с товарами"
 
-        manufacture = self.get_all_manufacturers()
-        manufacturer_cards = []
-        if manufacture:
-            for manufacturer in manufacture:
-                id_manufacturer = manufacturer[0]
-                image = manufacturer[2]
-
-                card_builder = Manufactures_Card(id_manufacturer, image, page)
-                manufacturer_cards.append(card_builder.container)
-        else:
-            pass
-
-        rows = []  # Массив строк
-        for i in range(0, len(manufacturer_cards), 2):
-            if i + 1 < len(manufacturer_cards):
-                # Если есть две карточки для строки
-                row = Row(
-                    controls=[
-                        manufacturer_cards[i],
-                        manufacturer_cards[i + 1]
-                    ],
-                    alignment=MainAxisAlignment.CENTER,
-                    spacing=20,
-                )
+        self.card_list = []
+        data_list = get_orders_list()
+        for i in data_list:
+            if i[2] == "canceled":
+                continue
             else:
-                # Если последняя карточка без пары
-                row = Row(
-                    controls=[manufacturer_cards[i]],
-                    alignment=MainAxisAlignment.CENTER,
-                    spacing=20,
-                )
-            rows.append(row)
+                cart = OrderCard(page, i[0], i[1], i[2], i[3], i[4], self.user_id)
+                self.card_list.append(cart.build())
 
-        show_conteiner = Container(
+
+
+        down_Container = Container(
             content=Column(
-                controls=[
-                    Container(
-                        content=Column(
-                            controls=rows,
-                            alignment=MainAxisAlignment.CENTER,
-                        ),
-                        alignment=Alignment(0, 0),
-                        expand=True,
-                    )
-                ],
-                spacing=10,
-                scroll=ScrollMode.ALWAYS,
+                controls=self.card_list,
+                expand=True,
+                alignment=MainAxisAlignment.START,
+                scroll=ScrollMode.ALWAYS
             ),
+            expand=True,
             width=page.width,
-            height=page.height / 1.42,
-            # padding=padding.only(bottom=10),
-            # border=border.all(width=2, color='white'),
+            height=page.height / 1.36,
         )
+
         """соединение всех элементов страницы"""
-        return View("/Производители", controls=[
+        return View("/active_order", controls=[
             Stack([
                 Column(
                     controls=[
                         first_part,
                         Stack([
                             icon_back,
-                            show_conteiner,
+                            down_Container,
                         ])
                     ]
                 ),

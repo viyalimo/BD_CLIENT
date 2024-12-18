@@ -3,8 +3,12 @@ from flet_route import Params, Basket
 import requests
 from help_function.Navigation import Navigation
 import json
+import socket
 
 class LoginPage(Navigation):
+    # host = socket.gethostbyname(socket.gethostname())
+    host = "localhost"
+    port = 30000
     def __init__(self):
         super().__init__()
 
@@ -35,7 +39,7 @@ class LoginPage(Navigation):
                 password.current.focus()
                 page.update()
                 return
-            responce = requests.post('http://localhost:30000/login', json={
+            responce = requests.post(f'http://{self.host}:{self.port}/login', json={
                 "username": name.current.value,
                 "password": password.current.value
             })
