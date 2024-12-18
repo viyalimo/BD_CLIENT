@@ -2,15 +2,21 @@ from functools import lru_cache
 import requests
 import io
 import base64
+
+
+
 from help_function.Crypt import Crypt
+import socket
 
+from help_function.cartmanagement import CART_MANAGEMENT
 
-class Navigation:
+class Navigation(CART_MANAGEMENT):
+    # host = str(socket.gethostbyname(socket.gethostname()))
     host = "localhost"
     port = 30000
 
     def __init__(self):
-        pass
+        super().__init__()
 
     @lru_cache
     def get_image(self, name, val, style=None):
@@ -96,7 +102,7 @@ class Navigation:
                 print("Продукты не найдены.")
                 return None
             else:
-                print(f"Ошибка: {response.status_code} - {response.reason}")
+                print(f"Ошибка: {response.status_code} - {response.reason}", "get_all_products")
                 return None
 
         except requests.exceptions.RequestException as e:
@@ -117,7 +123,7 @@ class Navigation:
                 print("Производители не найдены.")
                 return None
             else:
-                print(f"Ошибка: {response.status_code} - {response.reason}")
+                print(f"Ошибка: {response.status_code} - {response.reason}", "get_all_manufacturers")
                 return None
 
         except requests.exceptions.RequestException as e:
@@ -138,7 +144,7 @@ class Navigation:
                 print(f"Производитель с ID {id} не найден.")
                 return None
             else:
-                print(f"Ошибка: {response.status_code} - {response.reason}")
+                print(f"Ошибка: {response.status_code} - {response.reason}", "get_manufacturer_by_id")
                 return None
 
         except requests.exceptions.RequestException as e:
@@ -163,7 +169,7 @@ class Navigation:
                 print(f"Продукты производителя {manufacturer} не найдены.")
                 return None
             else:
-                print(f"Ошибка: {response.status_code} - {response.reason}")
+                print(f"Ошибка: {response.status_code} - {response.reason}", "get_products_by_manufacturer")
                 return None
 
         except requests.exceptions.RequestException as e:
@@ -188,7 +194,7 @@ class Navigation:
                 print(f"Произошла ошибка!")
                 return None
             else:
-                print(f"Ошибка: {response.status_code} - {response.reason}")
+                print(f"Ошибка: {response.status_code} - {response.reason}", "get_user_info")
                 return None
 
         except requests.exceptions.RequestException as e:
@@ -198,7 +204,7 @@ class Navigation:
     def update_photo(self, photo, key, id):
         try:
             muve = ["photo", photo]
-            response = requests.post('http://localhost:30000/editprofile', json={
+            response = requests.post(f'http://{self.host}:{self.port}/editprofile', json={
                 "id": id,
                 "muve": muve,
                 "key": key
@@ -209,7 +215,7 @@ class Navigation:
                 print(f"Произошла ошибка!")
                 return None
             else:
-                print(f"Ошибка: {response.status_code} - {response.reason}")
+                print(f"Ошибка: {response.status_code} - {response.reason}", "update_photo")
                 return None
 
         except requests.exceptions.RequestException as e:
@@ -219,7 +225,7 @@ class Navigation:
     def update_password(self, new_password, key, id):
         try:
             muve = ["password", new_password]
-            response = requests.post('http://localhost:30000/editprofile', json={
+            response = requests.post(f'http://{self.host}:{self.port}/editprofile', json={
                 "id": id,
                 "muve": muve,
                 "key": key
@@ -230,7 +236,7 @@ class Navigation:
                 print(f"Произошла ошибка!")
                 return None
             else:
-                print(f"Ошибка: {response.status_code} - {response.reason}")
+                print(f"Ошибка: {response.status_code} - {response.reason}", "update_password")
                 return None
 
         except requests.exceptions.RequestException as e:
@@ -240,7 +246,7 @@ class Navigation:
     def update_phone(self, number, key, id):
         try:
             muve = ["phone", number]
-            response = requests.post('http://localhost:30000/editprofile', json={
+            response = requests.post(f'http://{self.host}:{self.port}/editprofile', json={
                 "id": id,
                 "muve": muve,
                 "key": key
@@ -251,7 +257,7 @@ class Navigation:
                 print(f"Произошла ошибка!")
                 return None
             else:
-                print(f"Ошибка: {response.status_code} - {response.reason}")
+                print(f"Ошибка: {response.status_code} - {response.reason}", "update_phone")
                 return None
 
         except requests.exceptions.RequestException as e:
@@ -261,7 +267,7 @@ class Navigation:
     def LOG_OUT(self, key, id):
         try:
             muve = ["logout"]
-            response = requests.post('http://localhost:30000/editprofile', json={
+            response = requests.post(f'http://{self.host}:{self.port}/editprofile', json={
                 "id": id,
                 "muve": muve,
                 "key": key
@@ -272,7 +278,7 @@ class Navigation:
                 print(f"Произошла ошибка!")
                 return None
             else:
-                print(f"Ошибка: {response.status_code} - {response.reason}")
+                print(f"Ошибка: {response.status_code} - {response.reason}", "LOG_OUT")
                 return None
 
         except requests.exceptions.RequestException as e:
@@ -282,7 +288,7 @@ class Navigation:
     def DELETE_ACCOUNT(self, key, id):
         try:
             muve = ["delete"]
-            response = requests.post('http://localhost:30000/editprofile', json={
+            response = requests.post(f'http://{self.host}:{self.port}/editprofile', json={
                 "id": id,
                 "muve": muve,
                 "key": key
@@ -293,7 +299,7 @@ class Navigation:
                 print(f"Произошла ошибка!")
                 return None
             else:
-                print(f"Ошибка: {response.status_code} - {response.reason}")
+                print(f"Ошибка: {response.status_code} - {response.reason}", "DELETE_ACCOUNT")
                 return None
 
         except requests.exceptions.RequestException as e:
@@ -302,7 +308,17 @@ class Navigation:
 
     def search_product(self, name=None, category=None, min_price=None, max_price=None, manufacturer=None, color=None, sort_by=None ):
         try:
-            response = requests.post('http://localhost:30000/search', json={
+            if min_price and max_price:
+                pass
+            elif min_price:
+                min_price = min_price
+                max_price = 100000000000
+            elif max_price:
+                max_price = max_price
+                min_price = 1
+            else:
+                pass
+            response = requests.post(f'http://{self.host}:{self.port}/search', json={
                 "search_term": name,
                 "category": category,
                 "min_price": min_price,
@@ -319,7 +335,7 @@ class Navigation:
                 print(f"Произошла ошибка!")
                 return None
             else:
-                print(f"Ошибка: {response.status_code} - {response.reason}")
+                print(f"Ошибка: {response.status_code} - {response.reason}", "search_product")
                 return None
 
         except requests.exceptions.RequestException as e:

@@ -35,8 +35,11 @@ class Card_product(Navigation):
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.theme_mode = ThemeMode.DARK
-        id_product = int(params.get("id")[1:])
-        self.name, self.category, self.brand, self.price, self.quantity, self.color, self.image_base64, self.warehouse = self.get_product_id(id_product)[1:]
+        self.id = int(params.get("id")[1:])
+        self.name, self.category, self.brand, self.price, self.quantity, self.color, self.image_base64, self.warehouse = self.get_product_id(self.id)[1:]
+        key, user_name = page.client_storage.get("key")
+        self.user_id = int(self.get_user_info(user_name, key)[0])
+
 
         def next_page(muve):
             page.theme_mode = ThemeMode.DARK
@@ -48,6 +51,12 @@ class Card_product(Navigation):
                 next_page("/login")
             else:
                 next_page("/profile")
+
+        def cart_muve(e):
+            if page.client_storage.get("key") == None:
+                next_page("/login")
+            else:
+                next_page("/cart")
 
         def image_from_base64(base64_str: str):
             return Image(src=f"data:image/jpeg;base64,{base64_str}", width=800, height=800)
@@ -131,6 +140,66 @@ class Card_product(Navigation):
                 basket_btn.bgcolor = update_colors()["bgcolor"]
             basket_btn.update()
             page.update()
+
+        def on_click_bascet(e):
+            result = self.add_to_cart(self.user_id, self.id)
+            if result == True:
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Товар добавлен в корзину", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.GREEN,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+            elif result == False:
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Ошибка при добавлении товара в корзину!", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.RED,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+            else:
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Товара пока нет вналичии(", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.RED,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+
+        def on_click_buy(e):
+            result = self.create_direct_order(self.user_id, self.id)
+            if result == True:
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Заказ оформлен", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.GREEN,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+            elif result == False:
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Ошибка при оформлении заказа!", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.RED,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+            else:
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Товара пока нет вналичии(", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.RED,
+
+                )
+                page.snack_bar.open = True
+                page.update()
 
         def style_revert(e):
             if page.theme_mode == ThemeMode.DARK:
@@ -354,7 +423,8 @@ class Card_product(Navigation):
                               icon_size=update_size()['icon_rectangle_size'])
         """cart_batton"""
         Cart_button = IconButton(icon=Icons.SHOPPING_CART, icon_color=update_colors()["icon_color"],
-                                 icon_size=update_size()['icon_rectangle_size'])
+                                 icon_size=update_size()['icon_rectangle_size'],
+                                 on_click=lambda e: cart_muve(e))
         """profile"""
         Profile_button = IconButton(icon=Icons.PERSON, icon_color=update_colors()["icon_color"],
                                     icon_size=update_size()['icon_rectangle_size'],
@@ -391,6 +461,7 @@ class Card_product(Navigation):
             alignment=Alignment(0, 0),
             bgcolor=update_colors()["bgcolor"],
             on_hover=hower_btn_buy,
+            on_click=lambda e: on_click_buy(e),
             padding=padding.only(left=1),
             margin=margin.only(left=1, bottom=1),
             expand=True,
@@ -416,6 +487,7 @@ class Card_product(Navigation):
             bgcolor=update_colors()["bgcolor"],
             expand=True,
             on_hover=hower_btn_basket,
+            on_click=lambda e: on_click_bascet(e),
             padding=padding.only(right=1),
             margin=margin.only(right=1, bottom=1),
             width=146,

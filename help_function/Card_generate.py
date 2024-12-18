@@ -5,7 +5,7 @@ from flet_core.types import AppView
 
 class Card_generate:
     def __init__(self, id_product: int, name: str, price: float, image: ft.Image, cutigories: str, total_buy: int, page: ft.Page, brand):
-        # print("generate", id_product, name, price, image, cutigories, total_buy, page, brand)
+        # print("generate", id, name, price, image, cutigories, total_buy, page, brand)
         self.id_product = id_product
         self.name = name
         self.price = price

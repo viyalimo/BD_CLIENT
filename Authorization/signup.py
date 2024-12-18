@@ -3,9 +3,12 @@ from flet_route import Params, Basket
 import requests
 from help_function.Navigation import Navigation
 import json
-
+import socket
 
 class SignupPage(Navigation):
+    # host = socket.gethostbyname(socket.gethostname())
+    host = "localhost"
+    port = 30000
     def __init__(self):
         super().__init__()
 
@@ -116,7 +119,7 @@ class SignupPage(Navigation):
                 re_enter_password.current.value = ""
                 page.update()
                 return
-            responce = requests.post('http://localhost:30000/register', json={
+            responce = requests.post(f'http://{self.host}:{self.port}/register', json={
                 "username": name.current.value,
                 "password": password.current.value,
                 "phone_number": str(phone_number.current.value),

@@ -18,6 +18,12 @@ class UserPage(Navigation):
             page.client_storage.set("muve", muve)
             page.go("/loading")
 
+        def cart_muve(e):
+            if page.client_storage.get("key") == None:
+                next_page("/login")
+            else:
+                next_page("/cart")
+
         async def fetch_image_base64(image_url):
             try:
                 async with aiohttp.ClientSession() as session:
@@ -489,7 +495,9 @@ class UserPage(Navigation):
         icon_but = IconButton(icon=icons.SUNNY, on_click=style_revert, icon_color=update_colors()["icon_color"],
                               icon_size=update_size()['icon_rectangle_size'])
         Cart_button = IconButton(icon=icons.SHOPPING_CART, icon_color=update_colors()["icon_color"],
-                                 icon_size=update_size()['icon_rectangle_size'])
+                                 icon_size=update_size()['icon_rectangle_size'],
+                                 on_click=lambda e: cart_muve(e)
+                                 )
         Profile_button = IconButton(icon=icons.PERSON, icon_color=update_colors()["icon_color"],
                                     icon_size=update_size()['icon_rectangle_size'])
         log_out_btn = IconButton(icon=icons.LOGOUT, on_click=lambda e: dialog_window("logout"),

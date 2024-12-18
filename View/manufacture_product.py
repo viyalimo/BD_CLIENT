@@ -44,6 +44,12 @@ class ManufactureProd(Navigation):
             else:
                 next_page("/profile")
 
+        def cart_muve(e):
+            if page.client_storage.get("key") == None:
+                next_page("/login")
+            else:
+                next_page("/cart")
+
         def image_from_base64(base64_str: str):
             return Image(src=f"data:image/jpeg;base64,{base64_str}", width=200, height=200)
 
@@ -130,6 +136,9 @@ class ManufactureProd(Navigation):
             Menu_content.controls[0].content.controls[9].color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[10].content.content.color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[11].content.content.color = update_colors()['text_color']
+
+            manufacture_name.color = colors['text_color']
+            buy_container.color = update_colors()['text_color']
 
             """Обновление карточек"""
             for card_app in product_card:
@@ -307,7 +316,8 @@ class ManufactureProd(Navigation):
         icon_but = IconButton(icon=icons.SUNNY, on_click=style_revert, icon_color=update_colors()["icon_color"],
                               icon_size=update_size()['icon_rectangle_size'])
         Cart_button = IconButton(icon=icons.SHOPPING_CART, icon_color=update_colors()["icon_color"],
-                                 icon_size=update_size()['icon_rectangle_size'])
+                                 icon_size=update_size()['icon_rectangle_size'],
+                                 on_click=lambda e: cart_muve(e))
         Profile_button = IconButton(icon=icons.PERSON, icon_color=update_colors()["icon_color"],
                                     icon_size=update_size()['icon_rectangle_size'],
                                     on_click=profile_muve)
@@ -325,7 +335,7 @@ class ManufactureProd(Navigation):
                 alignment=MainAxisAlignment.SPACE_BETWEEN,
             ),
         )
-        Category_name = Container(
+        manufacture_name = Container(
             content=Text(
                 f"{self.name}", size=70, color=update_colors()["text_color"]
             ),
@@ -334,17 +344,17 @@ class ManufactureProd(Navigation):
             width=page.width,
             height=500,
         )
+        buy_container = Container(content=Text(f"Купивших этот бренд: {self.q_buy}", size=12, color=Colors.BLUE),
+                                  alignment=Alignment(0, 1),
+                                  expand=True)
         divider = Divider(height=update_size()["divider_size"], color=update_colors()["border_color"])
         first_part = Column(
             controls=[Container(
                 content=Column(
                     controls=[
                         top_rectangle,
-                        Category_name,
-                        Container(content=Text(f"Купивших этот бренд: {self.q_buy}", size=12, color=Colors.BLUE),
-                                  alignment=Alignment(0, 1),
-                                  expand=True),
-
+                        manufacture_name,
+                        buy_container,
                     ]
                 ),
                 expand=True,
