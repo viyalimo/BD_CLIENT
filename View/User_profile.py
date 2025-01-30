@@ -4,6 +4,8 @@ from help_function.Navigation import Navigation
 import base64
 import aiohttp
 import asyncio
+from help_function.Admin_control import Admin_control
+from help_function.Crypt import Crypt
 
 
 class UserPage(Navigation):
@@ -12,7 +14,15 @@ class UserPage(Navigation):
         self.action = None
 
     def view(self, page: Page, params: Params, basket: Basket):
+
         page.theme_mode = ThemeMode.DARK
+        self.key, self.user_name = page.client_storage.get("key")
+        user_info = self.get_user_info(self.user_name, self.key)
+        self.id = user_info[0]
+        self.name = user_info[1]
+        self.number = user_info[2]
+        self.role = user_info[3]
+        self.photo = user_info[4]
 
         def next_page(muve):
             page.client_storage.set("muve", muve)
@@ -258,11 +268,26 @@ class UserPage(Navigation):
                 page.snack_bar.open = True
                 page.update()
 
+        def settings_muve():
+            if self.get_shop_state(self.role):
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Особый режим не включен!", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.RED,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+            else:
+                next_page("/settings_admin")
+
         def dialog_window(value):
             if value == "password":
                 page.open(dlg_password)
             elif value == "delete":
                 page.open(dlg_delete)
+            elif value == "settings":
+                settings_muve()
             else:
                 page.open(dlg_logout)
 
@@ -381,6 +406,67 @@ class UserPage(Navigation):
             Menu_content.controls[0].content.controls[12].content.content.color = update_colors()['text_color']
 
             page.update()
+
+        def toggle_mode(e):
+            page.close(page.update_status)
+            state = self.get_shop_state(self.role)
+            if state == False:
+                text = Text("Обычный", size=15)
+                row_up_btn.controls = [round, text]
+                thumb_container.bgcolor = Colors.RED
+                result = self.update_shop_state(self.id)
+                if isinstance(result, bool):
+                    page.snack_bar = SnackBar(
+                        content=Row([Text(f"Сайт работает в ОБЫЧНОМ режиме!", color='white')],
+                                    alignment=MainAxisAlignment.CENTER),
+                        bgcolor=colors.RED,
+                    )
+                    page.snack_bar.open = True
+                else:
+                    page.snack_bar = SnackBar(
+                        content=Row([Text(f"{result}", color='white')],
+                                    alignment=MainAxisAlignment.CENTER),
+                        bgcolor=colors.RED,
+                    )
+                    page.snack_bar.open = True
+                page.update()
+
+            elif state == True:
+                text = Text("Особый", size=15)
+                row_up_btn.controls = [text, round]
+                thumb_container.bgcolor = Colors.GREEN
+                result = self.update_shop_state(self.id)
+                if isinstance(result, bool):
+                    page.snack_bar = SnackBar(
+                        content=Row([Text(f"Сайт работает в ОСОБОМ режиме!", color='white')],
+                                    alignment=MainAxisAlignment.CENTER),
+                        bgcolor=colors.GREEN,
+
+                    )
+                    page.snack_bar.open = True
+                    page.update()
+                else:
+                    page.snack_bar = SnackBar(
+                        content=Row([Text(f"{result}", color='white')],
+                                    alignment=MainAxisAlignment.CENTER),
+                        bgcolor=colors.RED,
+                    )
+                    page.snack_bar.open = True
+                    page.update()
+            else:
+                thumb_container.alignment = alignment.center_right
+                thumb_container.bgcolor = Colors.GREEN
+                page.snack_bar = SnackBar(
+                    content=Row([Text(f"{state}", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.GREEN,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+                self.LOG_OUT(self.key, self.id)
+                next_page("/login")
+
 
         """Верхняя часть"""
         Menu_content = Row(
@@ -502,12 +588,42 @@ class UserPage(Navigation):
                                     icon_size=update_size()['icon_rectangle_size'])
         log_out_btn = IconButton(icon=icons.LOGOUT, on_click=lambda e: dialog_window("logout"),
                                  icon_color=Colors.GREEN, icon_size=update_size()['icon_rectangle_size'])
-        delete_acc = IconButton(icon=Icons.DELETE, on_click=lambda e: dialog_window("delete"), icon_size=update_size()['icon_rectangle_size'], icon_color=Colors.RED)
+        if self.role == "admin":
+            delete_acc = IconButton(icon=Icons.SETTINGS, on_click=lambda e: dialog_window("settings"), icon_size=update_size()['icon_rectangle_size'], icon_color=Colors.RED)
+        else:
+            delete_acc = IconButton(icon=Icons.DELETE, on_click=lambda e: dialog_window("delete"), icon_size=update_size()['icon_rectangle_size'], icon_color=Colors.RED)
+
+        round = Container(
+            width=25,
+            height=20,
+            bgcolor=colors.WHITE,
+            border_radius=12.5,
+        )
+
+        text = Text("Обычный", size=15) if self.get_shop_state(self.role) else Text("Особый", size=15)
+
+        # Контейнер для переключателя
+        row_up_btn = Row(
+            controls=[round, text] if self.get_shop_state(self.role) else [text, round],
+            alignment=MainAxisAlignment.SPACE_AROUND,
+            vertical_alignment=CrossAxisAlignment.CENTER,
+        )
+
+        thumb_container = Container(
+            width=100,
+            height=25,
+            bgcolor=Colors.RED if self.get_shop_state(self.role) else Colors.GREEN,
+            border_radius=20,
+            content=row_up_btn,
+            on_click=lambda e: page.open(page.update_status),
+            visible=False if self.role != "admin" else True,
+        )
 
         top_rectangle = Container(
             content=Row(
                 [
                     Menu_but,
+                    Container(content=thumb_container, alignment=Alignment(0.1, 0), expand=True),
                     Row(
                         [icon_but, Cart_button, log_out_btn, delete_acc],
                         alignment=MainAxisAlignment.END,
@@ -525,13 +641,6 @@ class UserPage(Navigation):
         )
 
         """Нижняя часть"""
-        self.key, self.user_name = page.client_storage.get("key")
-        user_info = self.get_user_info(self.user_name, self.key)
-        self.id = user_info[0]
-        self.name = user_info[1]
-        self.number = user_info[2]
-        self.role = user_info[3]
-        self.photo = user_info[4]
         if self.photo == "None":
             photo_container = Container(
                 ref=photo_display,
@@ -641,6 +750,15 @@ class UserPage(Navigation):
             content=Text("Вы действительно хотите выйти из аккаунта!", size=20),
             actions=[
                 TextButton("Да", on_click=lambda e: log_out(e)),
+                TextButton("Нет", on_click=lambda e: page.close(dlg_logout)),
+            ],
+            actions_alignment=MainAxisAlignment.END,
+        )
+        page.update_status = AlertDialog(
+            modal=True,
+            content=Text("Переключить режим?", size=20),
+            actions=[
+                TextButton("Да", on_click=lambda e: toggle_mode(e)),
                 TextButton("Нет", on_click=lambda e: page.close(dlg_logout)),
             ],
             actions_alignment=MainAxisAlignment.END,

@@ -3,15 +3,34 @@ from flet_route import Params, Basket
 import requests
 from help_function.Navigation import Navigation
 import json
-import socket
+
+import os
+import configparser
 
 class LoginPage(Navigation):
-    # host = socket.gethostbyname(socket.gethostname())
-    host = "localhost"
-    port = 30000
-    def __init__(self):
-        super().__init__()
+    @staticmethod
+    def read_config():
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        project_dir = os.path.dirname(base_dir)
+        filename = os.path.join(project_dir, "client_config.ini")
 
+        if not os.path.exists(filename):
+            raise FileNotFoundError(f"Файл конфигурации не найден: {filename}")
+
+        config = configparser.ConfigParser()
+        config.read(filename)
+
+        try:
+            server_ip = config["server"]["ip"]
+            server_port = int(config["server"]["port"])
+        except KeyError as e:
+            raise KeyError(f"Ошибка в конфигурационном файле: отсутствует ключ {e}")
+
+        return [server_ip, server_port]
+
+    def __init__(self):
+        self.host, self.port = self.read_config()
+        super().__init__()
 
     def view(self, page: ft.Page, params: Params, basket: Basket):
         name = ft.Ref[ft.TextField]()

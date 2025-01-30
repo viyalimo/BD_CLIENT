@@ -15,6 +15,7 @@ from View.User_profile import UserPage
 from View.advanced_search import AdvancedSearchPage
 from View.search_result import AdvancedSearch
 from View.cart_page import CartPage
+from View.Settings_shop_page import Settings_shop_page
 
 class Router:
     def __init__(self, page: ft.Page):
@@ -39,6 +40,7 @@ class Router:
             path(url='/cart', clear=False, view=CartPage().view),
             path(url='/active_order', clear=False, view=Orders_page().view),
             path(url='/history_order', clear=False, view=History_page().view),
+            path(url='/settings_admin', clear=False, view=Settings_shop_page().view),
         ]
         self.page = page
 

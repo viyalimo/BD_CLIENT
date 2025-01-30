@@ -60,9 +60,9 @@ class CART_MANAGEMENT:
 
         return responce.json()
 
-    def cancel_order(self, order_id: int)->str:
+    def cancel_order(self, user_id: int, order_id: int)->str:
         responce = requests.post(f'http://{self.host}:{self.port}/cancel_order', json={
-            "user_id": -1,
+            "user_id": user_id,
             "product_id": -1,
             "order_id": order_id
         })

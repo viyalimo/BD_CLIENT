@@ -1,6 +1,5 @@
 from help_function.Navigation import Navigation
 from flet import *
-from help_function.Card_generate import Card_generate
 from flet_route import Params, Basket
 from help_function.Orders_CARD import OrderCard
 
@@ -28,8 +27,8 @@ class Orders_page(Navigation):
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.theme_mode = ThemeMode.DARK
-        key, user_name = page.client_storage.get("key")
-        self.user_id = int(self.get_user_info(user_name, key)[0])
+        self.key, self.user_name = page.client_storage.get("key")
+        self.user_id = int(self.get_user_info(self.user_name, self.key)[0])
 
         def next_page(muve):
             page.theme_mode = ThemeMode.DARK
@@ -156,6 +155,19 @@ class Orders_page(Navigation):
 
         def get_orders_list():
             result = self.get_all_orders(self.user_id)
+            if isinstance(result, list):
+                pass
+            else:
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Сайт временно недоступен!", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.RED,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+                self.LOG_OUT(self.key, self.user_id)
+                next_page("/login")
             return result
 
         def update_cards(e):

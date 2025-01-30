@@ -1,5 +1,4 @@
 from flet import *
-from help_function.Card_generate import Card_generate
 from flet_route import Params, Basket
 from help_function.Navigation import Navigation
 from help_function.cart_product_generate import Card_Cart
@@ -29,8 +28,8 @@ class CartPage(Navigation):
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.theme_mode = ThemeMode.DARK
-        key, user_name = page.client_storage.get("key")
-        self.user_id = int(self.get_user_info(user_name, key)[0])
+        self.key, self.user_name = page.client_storage.get("key")
+        self.user_id = int(self.get_user_info(self.user_name, self.key)[0])
 
         def next_page(muve):
             page.theme_mode = ThemeMode.DARK
@@ -183,7 +182,7 @@ class CartPage(Navigation):
 
         def clear_cart(e):
             result = self.clear_cart(self.user_id)
-            if result:
+            if result == True:
                 page.snack_bar = SnackBar(
                     content=Row([Text("Корзина очищена", color='white')],
                                 alignment=MainAxisAlignment.CENTER),
@@ -193,6 +192,18 @@ class CartPage(Navigation):
                 page.snack_bar.open = True
                 page.update()
                 next_page("/cart")
+            elif result == None:
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Сайт временно недоступен!", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.RED,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+                self.LOG_OUT(self.key, self.user_id)
+                next_page("/login")
+
             else:
                 page.snack_bar = SnackBar(
                     content=Row([Text("Ошибка при очистке корзины!", color='white')],
@@ -202,7 +213,6 @@ class CartPage(Navigation):
                 )
                 page.snack_bar.open = True
                 page.update()
-                next_page("/cart")
 
         def create_card_rows(cards, max_cards_per_row=8):
             rows = []
@@ -327,6 +337,7 @@ class CartPage(Navigation):
                               icon_color=update_colors()["icon_color"],
                               icon_size=update_size()["icon_rectangle_size"],
                               on_click=animate_menu)
+
         icon_but = IconButton(icon=icons.SUNNY, on_click=style_revert, icon_color=update_colors()["icon_color"],
                               icon_size=update_size()['icon_rectangle_size'])
 
@@ -374,29 +385,43 @@ class CartPage(Navigation):
 
         "Создание карточек с товарами"
         products = []
-        for i in self.get_cart(self.user_id):
-            products.append(self.get_product_id(int(i)))
-        product_card = []
-        prroduct_row = []
-        if products:
-            for product in products:
-                id_product = product[0]
-                name = product[1]
-                category = product[2]
-                brand = product[3]
-                price = product[4]
-                quantity = product[5]
-                color = product[6]
-                image_base64 = product[7]
-                warehouse = product[8]
+        result = self.get_cart(self.user_id)
+        product_row = []
+        if isinstance(result, list):
+            for i in result:
+                products.append(self.get_product_id(int(i)))
+            product_card = []
+            prroduct_row = []
+            if products:
+                for product in products:
+                    id_product = product[0]
+                    name = product[1]
+                    category = product[2]
+                    brand = product[3]
+                    price = product[4]
+                    quantity = product[5]
+                    color = product[6]
+                    image_base64 = product[7]
+                    warehouse = product[8]
 
-                app = Card_Cart(id_product, name, price, image_from_base64(image_base64), category, quantity, page, brand)
+                    app = Card_Cart(id_product, name, price, image_from_base64(image_base64), category, quantity, page,
+                                    brand)
 
-
-                product_card.append(app)
-            product_row = create_card_rows(product_card)
+                    product_card.append(app)
+                product_row = create_card_rows(product_card)
+            else:
+                product_row = []
         else:
-            product_row = []
+            page.snack_bar = SnackBar(
+                content=Row([Text("Сайт временно недоступен!", color='white')],
+                            alignment=MainAxisAlignment.CENTER),
+                bgcolor=colors.RED,
+
+            )
+            page.snack_bar.open = True
+            page.update()
+            self.LOG_OUT(self.key, self.user_id)
+            next_page("/login")
 
         card_container = Container(
             content=Column(

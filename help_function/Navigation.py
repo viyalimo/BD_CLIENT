@@ -2,20 +2,38 @@ from functools import lru_cache
 import requests
 import io
 import base64
-
-
+import configparser
+import os
 
 from help_function.Crypt import Crypt
-import socket
+
 
 from help_function.cartmanagement import CART_MANAGEMENT
 
 class Navigation(CART_MANAGEMENT):
-    # host = str(socket.gethostbyname(socket.gethostname()))
-    host = "localhost"
-    port = 30000
+
+    @staticmethod
+    def read_config():
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        project_dir = os.path.dirname(base_dir)
+        filename = os.path.join(project_dir, "client_config.ini")
+
+        if not os.path.exists(filename):
+            raise FileNotFoundError(f"Файл конфигурации не найден: {filename}")
+
+        config = configparser.ConfigParser()
+        config.read(filename)
+
+        try:
+            server_ip = config["server"]["ip"]
+            server_port = int(config["server"]["port"])
+        except KeyError as e:
+            raise KeyError(f"Ошибка в конфигурационном файле: отсутствует ключ {e}")
+
+        return [server_ip, server_port]
 
     def __init__(self):
+        self.host, self.port = self.read_config()
         super().__init__()
 
     @lru_cache
@@ -88,8 +106,6 @@ class Navigation(CART_MANAGEMENT):
 
         except requests.exceptions.RequestException as e:
             print(f"Произошла ошибка при подключении: {e}")
-
-    import requests
 
     def get_all_products(self):
         try:
@@ -341,3 +357,16 @@ class Navigation(CART_MANAGEMENT):
         except requests.exceptions.RequestException as e:
             print(f"Произошла ошибка при подключении: {e}")
             return None
+
+    def get_shop_state(self, user_role):
+        if user_role == "admin":
+            response = requests.get(f'http://{self.host}:{self.port}/get_state_shop')
+            return response.json()
+        return "У вас нет прав!"
+
+
+    def update_shop_state(self, user_id):
+        response = requests.post(f'http://{self.host}:{self.port}/set_state_shop', json={
+            "user_id": user_id,
+        })
+        return response.json()

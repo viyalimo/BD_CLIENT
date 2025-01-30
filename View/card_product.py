@@ -3,6 +3,7 @@ from flet_route import Params, Basket
 from help_function.Navigation import Navigation
 from help_function.Card_generate import Card_generate
 
+
 class Card_product(Navigation):
     def __init__(self):
         self.id = None
@@ -32,14 +33,11 @@ class Card_product(Navigation):
         ]
         super().__init__()
 
-
     def view(self, page: Page, params: Params, basket: Basket):
         page.theme_mode = ThemeMode.DARK
         self.id = int(params.get("id")[1:])
-        self.name, self.category, self.brand, self.price, self.quantity, self.color, self.image_base64, self.warehouse = self.get_product_id(self.id)[1:]
-        key, user_name = page.client_storage.get("key")
-        self.user_id = int(self.get_user_info(user_name, key)[0])
-
+        self.name, self.category, self.brand, self.price, self.quantity, self.color, self.image_base64, self.warehouse = self.get_product_id(
+            self.id)[1:]
 
         def next_page(muve):
             page.theme_mode = ThemeMode.DARK
@@ -142,6 +140,10 @@ class Card_product(Navigation):
             page.update()
 
         def on_click_bascet(e):
+            if page.client_storage.get("key") == None:
+                return next_page("/login")
+            key, user_name = page.client_storage.get("key")
+            self.user_id = int(self.get_user_info(user_name, key)[0])
             result = self.add_to_cart(self.user_id, self.id)
             if result == True:
                 page.snack_bar = SnackBar(
@@ -161,6 +163,17 @@ class Card_product(Navigation):
                 )
                 page.snack_bar.open = True
                 page.update()
+            elif result == None:
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Сайт временно недоступен!", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.RED,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+                self.LOG_OUT(key, self.user_id)
+                next_page("/login")
             else:
                 page.snack_bar = SnackBar(
                     content=Row([Text("Товара пока нет вналичии(", color='white')],
@@ -172,6 +185,10 @@ class Card_product(Navigation):
                 page.update()
 
         def on_click_buy(e):
+            if page.client_storage.get("key") == None:
+                return next_page("/login")
+            key, user_name = page.client_storage.get("key")
+            self.user_id = int(self.get_user_info(user_name, key)[0])
             result = self.create_direct_order(self.user_id, self.id)
             if result == True:
                 page.snack_bar = SnackBar(
@@ -182,6 +199,17 @@ class Card_product(Navigation):
                 )
                 page.snack_bar.open = True
                 page.update()
+            elif result == None:
+                page.snack_bar = SnackBar(
+                    content=Row([Text("Сайт временно недоступен!", color='white')],
+                                alignment=MainAxisAlignment.CENTER),
+                    bgcolor=colors.GREEN,
+
+                )
+                page.snack_bar.open = True
+                page.update()
+                self.LOG_OUT(key, self.user_id)
+                next_page("/login")
             elif result == False:
                 page.snack_bar = SnackBar(
                     content=Row([Text("Ошибка при оформлении заказа!", color='white')],
@@ -219,7 +247,6 @@ class Card_product(Navigation):
             buy_btn.bgcolor = colors["bgcolor"]
             buy_btn.content.controls[0].controls[0].color = colors["text_color"]
 
-
             basket_btn.bgcolor = colors["bgcolor"]
             basket_btn.content.controls[0].controls[0].color = colors["text_color"]
 
@@ -234,7 +261,7 @@ class Card_product(Navigation):
             specifications.controls[0].content.controls[0].controls[6].color = colors["text_color"]
             """Menu"""
             Menu_but.icon_color = colors["icon_color"]
-            Image_Product.content.controls[0].border=border.all(2, color=colors["border_color"])
+            Image_Product.content.controls[0].border = border.all(2, color=colors["border_color"])
             specifications.controls[0].border = border.all(2, color=colors["border_color"])
 
             buy_btn.border = border.all(2, color=colors["border_color"])
@@ -247,7 +274,6 @@ class Card_product(Navigation):
             Menu_content.controls[0].border = border.all(2, color=colors["border_color"])
 
             show_conteiner.content.controls[0].controls[0].border = border.all(2, color=colors["border_color"])
-
 
             Menu_content.controls[0].bgcolor = update_colors()['bgcolor']
             """Обновление цветов в меню"""
@@ -267,8 +293,6 @@ class Card_product(Navigation):
             Menu_content.controls[0].content.controls[11].content.content.color = update_colors()['text_color']
             Menu_content.controls[0].content.controls[12].content.content.color = update_colors()['text_color']
 
-
-
             icon_back.content = update_images()
             show_conteiner.content.controls[0].controls[0].content.content.controls[1].color = colors["text_color"]
             upper_part.content.controls[2].color = colors["text_color"]
@@ -278,7 +302,7 @@ class Card_product(Navigation):
                 updated_colors = card_app.update_colors()
                 card_app.container1.bgcolor = updated_colors["bgcolor"]
                 card_app.container1.border = border.all(2, updated_colors["card_border_color"])
-                #card_app.icon_container_.bgcolor = updated_colors["icon_background_color"]
+                # card_app.icon_container_.bgcolor = updated_colors["icon_background_color"]
 
                 card_app.container1.content.controls[0].content.controls[0].border = border.all(2, updated_colors[
                     "border_color"])
@@ -296,7 +320,7 @@ class Card_product(Navigation):
                 card_app.container1.content.controls[2].content.controls[0].controls[4].color = updated_colors[
                     "text_color"]
                 # Обновляем элементы
-                #card_app.icon_container_.update()
+                # card_app.icon_container_.update()
                 card_app.container1.update()
 
             """обновление контейнера с похожими товарами"""
@@ -304,7 +328,6 @@ class Card_product(Navigation):
             show_conteiner.content.controls[0].controls[0].bgcolor = update_colors()['bgcolor']
 
             page.update()
-
 
         """Upper Content"""
 
@@ -316,7 +339,7 @@ class Card_product(Navigation):
                         controls=[
                             Container(
                                 content=Text("Категории", size=update_size()["Menu_zag_text_size"],
-                                             color=update_colors()["text_color"],),
+                                             color=update_colors()["text_color"], ),
                                 padding=padding.only(top=10, left=10),
                             ),
                             Divider(height=2, color=update_colors()["text_color"]),
@@ -387,7 +410,7 @@ class Card_product(Navigation):
                             Container(
                                 content=TextButton(
                                     content=Text("Расширенный поиск", size=update_size()["Menu_zag_text_size"],
-                                                    color=update_colors()["text_color"]),
+                                                 color=update_colors()["text_color"]),
                                     on_click=lambda e: next_page('/search')),
                                 padding=padding.only(left=5),
                             ),
@@ -648,11 +671,11 @@ class Card_product(Navigation):
                 image_base64 = product[7]
                 warehouse = product[8]
 
-                app = Card_generate(id_product, name, price_prod, image_from_base64(image_base64), category, quantity, page, brand)
+                app = Card_generate(id_product, name, price_prod, image_from_base64(image_base64), category, quantity,
+                                    page, brand)
                 product_card.append(app)
         else:
             pass
-
 
         """Product row"""
         product_row = Row(

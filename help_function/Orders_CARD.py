@@ -30,7 +30,7 @@ class OrderCard(Navigation):
             cancel_button.visible=False
             status_label.update()
             cancel_button.update()
-            self.cancel_order(self.order_id)
+            self.cancel_order(self.user_id, self.order_id)
 
         if self.cancel_callback == "c":
             status_label.color = "red"
@@ -57,6 +57,7 @@ class OrderCard(Navigation):
                 color="white",
                 visible=True
             )
+
         # Полоска заказа
         order_strip = ft.Container(
             content=ft.Row(

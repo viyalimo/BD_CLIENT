@@ -49,7 +49,6 @@ class Main_page(Navigation):
     def view(self, page: Page, params: Params, basket: Basket):
         page.theme_mode = ThemeMode.DARK
         page.client_storage.set("style", page.theme_mode.value)
-
         self.get_products_total()
 
         def next_page(muve):

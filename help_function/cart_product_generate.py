@@ -140,8 +140,6 @@ class Card_Cart(Navigation):
                 self.page.snack_bar.open = True
                 self.page.update()
 
-
-
         def next_page(muve):
             self.page.client_storage.set("muve", muve)
             self.page.go("/loading")
